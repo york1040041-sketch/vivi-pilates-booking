@@ -99,6 +99,11 @@
         .year-scroll { height: 450px; overflow-y: auto; padding-right: 5px; }
         .month-container { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         
+        /* 時段選擇按鈕樣式 */
+        .time-slot-btn { width: 100%; padding: 15px; margin-bottom: 10px; background-color: white; border: 2px solid var(--primary-color); color: var(--primary-color); border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .time-slot-btn:hover:not(:disabled) { background-color: var(--primary-color); color: white; }
+        .time-slot-btn:disabled { cursor: not-allowed; border-color: #ddd; }
+
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
         input, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; }
@@ -129,17 +134,26 @@
     <div id="page-home" class="page active">
         <p style="text-align: center; color: #666; font-size: 14px; margin-bottom: 20px;">
             請選擇您欲預約的日期<br>
-            <span style="font-size: 12px; color: var(--primary-color);">時段：每日 5:00 PM - 6:00 PM (上限 3 人)</span>
+            <span style="font-size: 12px; color: var(--primary-color);">(每堂課上限 3 人)</span>
         </p>
         <div class="year-scroll" id="calendar-container"></div>
     </div>
 
-    <div id="page-form" class="page">
+    <div id="page-time" class="page">
         <button class="back-btn" onclick="goToPage('page-home')">← 返回日曆</button>
+        <h2 style="margin-top:0;">選擇預約時段</h2>
+        <div style="text-align: center; margin-bottom: 20px; font-weight: bold; color: var(--primary-color); font-size: 18px;" id="time-display-date">
+        </div>
+        <div id="time-slots-container">
+            </div>
+    </div>
+
+    <div id="page-form" class="page">
+        <button class="back-btn" onclick="goToPage('page-time')">← 返回重選時段</button>
         <h2 style="margin-top:0;">填寫預約資訊</h2>
         <div style="background-color: #f0f0f0; padding: 10px; border-radius: 8px; margin-bottom: 20px; font-size: 14px;">
             <strong>預約日期：</strong> <span id="display-date"></span><br>
-            <strong>預約時間：</strong> 5:00 PM - 6:00 PM
+            <strong>預約時間：</strong> <span id="display-time" style="color: var(--primary-color); font-weight: bold;"></span>
         </div>
 
         <form id="booking-form" onsubmit="submitForm(event)">
@@ -178,12 +192,26 @@
 </div>
 
 <script>
-    // ！！！！請在這裡填入您剛剛複製的 Google Web App 網址！！！！
     const API_URL = "https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec";
-    
     const MAX_PEOPLE = 3;
-    let selectedDateStr = "";
-    let cloudBookingData = {}; // 雲端抓下來的資料
+
+    // 定義每週營業時間配置 (陣列內為每個小時的開頭，例如 10 代表 10:00 - 11:00)
+    // 0=週日, 1=週一, 2=週二, 3=週三, 4=週四, 5=週五, 6=週六
+    const SCHEDULE = {
+        1: [10, 11, 12, 13, 14, 15],             // 週一: 10:00~16:00
+        2: [9, 10, 11, 12, 13, 14],              // 週二: 09:00~15:00
+        3: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], // 週三: 09:00~20:00
+        4: [13],                                 // 週四: 13:00~14:00
+        5: [9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], // 週五: 09:00~20:00
+        6: [11, 12, 13],                         // 週六: 11:00~14:00
+        0: []                                    // 週日: 休息
+    };
+
+    let selectedDateStr = "";      // "2026-05-25"
+    let selectedDayOfWeek = 0;     // 1~6, 0
+    let selectedDataKey = "";      // "2026-05-25_10:00" (傳給雲端的專屬KEY)
+    let selectedTimeLabel = "";    // "10:00 - 11:00" (顯示給客人看的)
+    let cloudBookingData = {};     
 
     function showLoading(text) {
         document.getElementById('loading-text').innerText = text;
@@ -199,7 +227,6 @@
         document.getElementById(pageId).classList.add('active');
     }
 
-    // 從 Google Sheets 獲取最新預約人數
     async function fetchBookings() {
         showLoading("正在獲取最新預約狀態...");
         try {
@@ -214,10 +241,9 @@
         }
     }
 
-    // 渲染日曆
     function renderCalendar() {
         const container = document.getElementById('calendar-container');
-        container.innerHTML = ''; // 清空重新渲染
+        container.innerHTML = ''; 
         const today = new Date();
         const currentYear = today.getFullYear();
         const currentMonthIndex = today.getMonth(); 
@@ -261,21 +287,33 @@
                 const dateKey = `${renderYear}-${String(renderMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 
                 const isPastDate = (renderYear === currentYear && renderMonth === currentMonthIndex && day < currentDate);
-                
-                // 從雲端資料計算剩餘人數
-                const currentBookings = cloudBookingData[dateKey] || 0;
-                const remaining = MAX_PEOPLE - currentBookings;
+                const dayOfWeek = new Date(renderYear, renderMonth, day).getDay();
+                const slotsForDay = SCHEDULE[dayOfWeek];
 
-                if (isPastDate) {
+                if (slotsForDay.length === 0) {
+                    // 週日休館
+                    cell.className = 'day-cell past';
+                    cell.innerHTML = `<div>${day}</div><div class="status-text past-text">休館</div>`;
+                } else if (isPastDate) {
                     cell.className = 'day-cell past';
                     cell.innerHTML = `<div>${day}</div><div class="status-text past-text">已過期</div>`;
-                } else if (remaining <= 0) {
-                    cell.className = 'day-cell full';
-                    cell.innerHTML = `<div>${day}</div><div class="status-text full-text">已額滿</div>`;
                 } else {
-                    cell.className = 'day-cell';
-                    cell.innerHTML = `<div>${day}</div><div class="availability">剩 ${remaining} 位</div>`;
-                    cell.onclick = () => selectDate(dateKey, renderYear, renderMonth + 1, day);
+                    // 檢查當日是否所有時段都額滿
+                    let fullSlotsCount = 0;
+                    slotsForDay.forEach(h => {
+                        const timeKey = `${dateKey}_${String(h).padStart(2, '0')}:00`;
+                        const booked = cloudBookingData[timeKey] || 0;
+                        if (booked >= MAX_PEOPLE) fullSlotsCount++;
+                    });
+
+                    if (fullSlotsCount === slotsForDay.length) {
+                        cell.className = 'day-cell full';
+                        cell.innerHTML = `<div>${day}</div><div class="status-text full-text">已額滿</div>`;
+                    } else {
+                        cell.className = 'day-cell';
+                        cell.innerHTML = `<div>${day}</div><div class="availability">可預約</div>`;
+                        cell.onclick = () => selectDate(dateKey, renderYear, renderMonth + 1, day, dayOfWeek);
+                    }
                 }
                 
                 grid.appendChild(cell);
@@ -285,9 +323,65 @@
         }
     }
 
-    function selectDate(dateKey, year, month, day) {
+    // 點擊日期 -> 進入時間選擇頁面
+    function selectDate(dateKey, year, month, day, dayOfWeek) {
         selectedDateStr = dateKey;
-        document.getElementById('display-date').innerText = `${year}年 ${month}月 ${day}日`;
+        selectedDayOfWeek = dayOfWeek;
+        document.getElementById('time-display-date').innerText = `${year}年 ${month}月 ${day}日`;
+        renderTimeSlots();
+        goToPage('page-time');
+    }
+
+    // 渲染當日的所有時段
+    function renderTimeSlots() {
+        const container = document.getElementById('time-slots-container');
+        container.innerHTML = '';
+        const slots = SCHEDULE[selectedDayOfWeek];
+        
+        // 為了防呆，如果當天剛好是「今天」，要檢查已經過去的小時
+        const today = new Date();
+        const isToday = (selectedDateStr === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
+        const currentHour = today.getHours();
+
+        slots.forEach(h => {
+            const timeLabel = `${String(h).padStart(2, '0')}:00 - ${String(h+1).padStart(2, '0')}:00`;
+            const dataKey = `${selectedDateStr}_${String(h).padStart(2, '0')}:00`; // Ex: 2026-05-25_10:00
+            
+            const booked = cloudBookingData[dataKey] || 0;
+            const remaining = MAX_PEOPLE - booked;
+            const isPastTime = (isToday && h <= currentHour); // 已經過的小時無法點擊
+
+            const btn = document.createElement('button');
+            btn.className = 'time-slot-btn';
+            
+            if (isPastTime) {
+                btn.disabled = true;
+                btn.innerText = `${timeLabel} (已結束)`;
+                btn.style.backgroundColor = '#f1f1f1';
+                btn.style.borderColor = '#ddd';
+                btn.style.color = '#aaa';
+            } else if (remaining <= 0) {
+                btn.disabled = true;
+                btn.innerText = `${timeLabel} (已額滿)`;
+                btn.style.backgroundColor = '#eee';
+                btn.style.borderColor = '#eee';
+                btn.style.color = '#e74c3c';
+            } else {
+                btn.innerText = `${timeLabel} (剩 ${remaining} 位)`;
+                btn.onclick = () => selectTime(dataKey, timeLabel);
+            }
+            container.appendChild(btn);
+        });
+    }
+
+    // 點擊時間 -> 進入表單頁面
+    function selectTime(dataKey, timeLabel) {
+        selectedDataKey = dataKey;
+        selectedTimeLabel = timeLabel;
+        
+        document.getElementById('display-date').innerText = document.getElementById('time-display-date').innerText;
+        document.getElementById('display-time').innerText = timeLabel;
+        
         document.getElementById('booking-form').reset();
         goToPage('page-form');
     }
@@ -300,8 +394,9 @@
         btn.disabled = true;
         showLoading("正在送出預約資料...");
 
+        // 注意：這裡的 date 現在包含了日期與時間，例如 2026-05-25_10:00
         const payload = {
-            date: selectedDateStr,
+            date: selectedDataKey, 
             name: document.getElementById('name').value,
             phone: document.getElementById('phone').value,
             notes: document.getElementById('notes').value
@@ -314,7 +409,7 @@
             });
 
             // 成功後準備畫面資料
-            document.getElementById('result-time').innerText = `${selectedDateStr} (5:00 PM - 6:00 PM)`;
+            document.getElementById('result-time').innerText = `${document.getElementById('time-display-date').innerText} (${selectedTimeLabel})`;
             document.getElementById('result-name').innerText = payload.name;
             document.getElementById('result-phone').innerText = payload.phone;
             document.getElementById('result-notes').innerText = payload.notes || '無';
@@ -330,12 +425,10 @@
     }
 
     function finishBooking() {
-        // 完成預約後返回首頁，重新向雲端抓取最新資料以更新人數
         fetchBookings();
         goToPage('page-home');
     }
 
-    // 網頁載入時立刻向雲端要資料
     window.onload = () => {
         fetchBookings();
     };
