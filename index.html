@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIVI PILATES 線上預約</title>
     <style>
-        @import url('https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec');
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
 
         :root {
             --primary-color: #BCA39B; 
@@ -14,30 +14,11 @@
             --text-color: #4A4A4A;
             --card-bg: #FFFFFF;
             --danger-color: #D98989; 
+            --success-color: #7DA28D;
         }
 
-        body {
-            font-family: 'Helvetica Neue', Arial, 'LiHei Pro', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-        }
-
-        #app-container {
-            width: 100%;
-            max-width: 500px;
-            background-color: var(--bg-color);
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-            box-shadow: 0 0 40px rgba(0,0,0,0.03);
-        }
-
+        body { font-family: 'Helvetica Neue', Arial, 'LiHei Pro', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+        #app-container { width: 100%; max-width: 500px; background-color: var(--bg-color); min-height: 100vh; position: relative; overflow-x: hidden; box-shadow: 0 0 40px rgba(0,0,0,0.03); }
         .hero-banner { background: linear-gradient(145deg, #F3EBE6 0%, #E8DCD6 100%); padding: 80px 20px 50px; text-align: center; position: relative; }
         .hero-title { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 700; color: var(--dark-accent); margin: 0; line-height: 1; letter-spacing: 4px; }
         .hero-subtitle { font-family: 'Playfair Display', serif; font-size: 46px; font-style: italic; font-weight: 500; color: var(--dark-accent); margin: 5px 0 25px; }
@@ -50,10 +31,14 @@
         .card-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; color: var(--text-color); margin: 0 0 10px 0; }
         .card-subtitle { font-size: 14px; color: #888; margin: 0 0 20px 0; }
 
-        .mode-switcher { display: flex; gap: 10px; margin-bottom: 15px; }
-        .mode-btn { flex: 1; padding: 12px 5px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .mode-switcher { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .mode-btn { flex: 1; min-width: 45%; padding: 12px 5px; border: 1px solid var(--primary-color); background: transparent; color: var(--primary-color); border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
         .mode-btn.active { background: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(188, 163, 155, 0.4); }
         .mode-hint { font-size: 12px; color: var(--danger-color); text-align: center; margin-bottom: 15px; display: none; background: #fff5f5; padding: 8px; border-radius: 6px; }
+        
+        /* 補課專用按鈕 */
+        #btn-makeup { display: none; border-color: var(--success-color); color: var(--success-color); }
+        #btn-makeup.active { background: var(--success-color); color: white; box-shadow: 0 4px 10px rgba(125, 162, 141, 0.4); }
 
         .view-bookings-btn { width: 100%; padding: 15px; background-color: transparent; border: 1px dashed var(--primary-color); color: var(--dark-accent); border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
         .view-bookings-btn:hover { background-color: rgba(188, 163, 155, 0.1); }
@@ -78,9 +63,14 @@
         .day-cell { aspect-ratio: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; border-radius: 12px; cursor: pointer; background-color: transparent; font-size: 15px; font-weight: 500; transition: all 0.2s ease; }
         .day-cell.empty { cursor: default; }
         .day-cell:hover:not(.empty):not(.full):not(.past) { background-color: var(--primary-color); color: white; transform: scale(1.05); box-shadow: 0 4px 12px rgba(188, 163, 155, 0.4); }
+        
+        /* 補課模式的日曆懸停顏色 */
+        .mode-makeup-active .day-cell:hover:not(.empty):not(.full):not(.past) { background-color: var(--success-color); box-shadow: 0 4px 12px rgba(125, 162, 141, 0.4); }
+
         .day-cell.full { color: #ccc; cursor: not-allowed; text-decoration: line-through; }
         .day-cell.past { color: #e0e0e0; cursor: not-allowed; }
         .availability { font-size: 10px; margin-top: 2px; color: var(--primary-color); }
+        .mode-makeup-active .availability { color: var(--success-color); }
         .day-cell:hover:not(.empty):not(.full):not(.past) .availability { color: rgba(255,255,255,0.9); }
         .status-text { font-size: 10px; margin-top: 2px; }
         
@@ -112,13 +102,19 @@
         .booking-mode-tag { padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; margin-bottom: 5px; display: inline-block; }
         .tag-single { background-color: #eee; color: #666; }
         .tag-bimonthly { background-color: var(--primary-color); color: white; }
+        .tag-makeup { background-color: var(--success-color); color: white; }
         .booking-date { font-weight: bold; color: var(--dark-accent); font-size: 16px;}
         .booking-time { color: #666; font-size: 14px; margin-top: 4px;}
         .empty-bookings { text-align: center; color: #999; padding: 40px 0; font-size: 15px; }
+        
+        .action-btns-row { display: flex; gap: 8px; margin-top: 10px; }
+        .leave-btn { background: none; border: 1px solid #eee; color: #f39c12; padding: 6px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s; }
+        .leave-btn:hover { background-color: #fffaf0; border-color: #f39c12; }
         .delete-booking-btn { background: none; border: 1px solid #eee; color: var(--danger-color); padding: 8px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s; }
         .delete-booking-btn:hover { background-color: #fff5f5; border-color: var(--danger-color); }
         .details-btn { background: none; border: none; color: var(--primary-color); font-size: 12px; padding: 0; margin-top: 10px; cursor: pointer; text-decoration: underline; }
         .details-content { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #eee; font-size: 13px; color: #666; line-height: 1.6; }
+        .detail-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 
         .footer-logo-container { text-align: center; padding: 40px 30px 60px; background-color: var(--bg-color); position: relative; }
         .studio-logo-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -153,8 +149,12 @@
                 <div class="mode-switcher">
                     <button id="btn-single" class="mode-btn active" onclick="setMode('single')">單堂預約</button>
                     <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約</button>
+                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課額度</button>
                 </div>
                 <div id="bimonthly-hint" class="mode-hint">雙月限定：單數月的第一週 (限週一/二)</div>
+                <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
+                    您有 <span id="credit-count" style="font-weight:bold;">0</span> 堂補課額度可用
+                </div>
                 
                 <button class="view-bookings-btn" onclick="showMyBookings()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
@@ -220,7 +220,7 @@
                     <input type="tel" id="phone" required placeholder="請輸入電話">
                 </div>
                 <div class="form-group">
-                    <label for="email">電子信箱 Email</label>
+                    <label for="email">電子信箱 Email (接收提醒用)</label>
                     <input type="email" id="email" required placeholder="請輸入 Email">
                 </div>
                 <div class="form-group">
@@ -242,7 +242,7 @@
             
             <div class="info-card">
                 <div class="info-row"><div class="info-label">方案</div><div class="info-value" id="result-mode"></div></div>
-                <div class="info-row"><div class="info-label">日期</div><div class="info-value" id="result-date" style="font-size: 13px; line-height:1.4;"></div></div>
+                <div class="info-row"><div class="info-label">日期</div><div class="info-value" id="result-date" style="font-size: 12px; line-height:1.4;"></div></div>
                 <div class="info-row"><div class="info-label">時間</div><div class="info-value" id="result-time"></div></div>
                 <div class="info-row"><div class="info-label">姓名</div><div class="info-value" id="result-name"></div></div>
             </div>
@@ -255,8 +255,7 @@
 <script>
     // ！！！！請務必確認這裡是您最新的 Google Web App 網址！！！！
     const API_URL = "https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec";
-    
-    const MAX_PEOPLE = 4; // 上限 4 人
+    const MAX_PEOPLE = 4;
 
     const SCHEDULE = {
         1: [{start: "06:30", end: "07:25"}, {start: "07:35", end: "08:30"}, {start: "08:45", end: "09:40"}], 
@@ -264,7 +263,7 @@
         3: [], 4: [], 5: [], 6: [], 0: [] 
     };
 
-    let currentMode = 'single'; 
+    let currentMode = 'single'; // 'single', 'bimonthly', 'makeup'
     let selectedDateStr = "";      
     let selectedDayOfWeek = 0;     
     let selectedDatesArray = [];   
@@ -290,11 +289,39 @@
         window.scrollTo(0, 0); 
     }
 
+    function checkMakeUpCredits() {
+        let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
+        const makeupBtn = document.getElementById('btn-makeup');
+        const makeupHint = document.getElementById('makeup-hint');
+        const creditCount = document.getElementById('credit-count');
+        
+        if (credits > 0) {
+            makeupBtn.style.display = 'block';
+            creditCount.innerText = credits;
+            if (currentMode === 'makeup') makeupHint.style.display = 'block';
+        } else {
+            makeupBtn.style.display = 'none';
+            makeupHint.style.display = 'none';
+            if (currentMode === 'makeup') setMode('single'); 
+        }
+    }
+
     function setMode(mode) {
         currentMode = mode;
         document.getElementById('btn-single').className = mode === 'single' ? 'mode-btn active' : 'mode-btn';
         document.getElementById('btn-bimonthly').className = mode === 'bimonthly' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-makeup').className = mode === 'makeup' ? 'mode-btn active' : 'mode-btn';
+        
         document.getElementById('bimonthly-hint').style.display = mode === 'bimonthly' ? 'block' : 'none';
+        
+        const appContainer = document.getElementById('app-container');
+        if (mode === 'makeup') {
+            document.getElementById('makeup-hint').style.display = 'block';
+            appContainer.classList.add('mode-makeup-active');
+        } else {
+            document.getElementById('makeup-hint').style.display = 'none';
+            appContainer.classList.remove('mode-makeup-active');
+        }
         renderCalendar(); 
     }
 
@@ -303,6 +330,7 @@
         try {
             const response = await fetch(API_URL + "?t=" + new Date().getTime());
             cloudBookingData = await response.json();
+            checkMakeUpCredits();
             renderCalendar(); 
         } catch (error) {
             console.error(error);
@@ -349,8 +377,6 @@
 
         const firstDay = new Date(currentRenderYear, currentRenderMonth, 1).getDay();
         const daysInMonth = new Date(currentRenderYear, currentRenderMonth + 1, 0).getDate();
-
-        // 判斷是否為單數月 (JS中，0是1月)
         const isOddMonth = (currentRenderMonth % 2 === 0);
 
         for (let j = 0; j < firstDay; j++) {
@@ -377,7 +403,6 @@
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}`;
             } else if (currentMode === 'bimonthly' && (!isOddMonth || !isFirstWeek || !isMonOrTue)) {
-                // 【關鍵防呆】：雙月預約只能選單數月、第一週、且是週一或週二
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
             } else {
@@ -392,12 +417,11 @@
 
     function getDatesForMode(startYear, startMonthIdx, startDay, dayOfWeek) {
         let dates = [];
-        if (currentMode === 'single') {
+        if (currentMode === 'single' || currentMode === 'makeup') {
             dates.push(`${startYear}-${String(startMonthIdx + 1).padStart(2, '0')}-${String(startDay).padStart(2, '0')}`);
             return dates;
         }
         
-        // 雙月模式：包含兩個月內所有相同的星期幾
         for (let m = 0; m < 2; m++) {
             let y = startYear;
             let mm = startMonthIdx + m;
@@ -418,10 +442,12 @@
     function selectDate(dateKey, year, monthIdx, day, dayOfWeek) {
         selectedDateStr = dateKey;
         selectedDayOfWeek = dayOfWeek;
-        
         selectedDatesArray = getDatesForMode(year, monthIdx, day, dayOfWeek);
 
-        let displayModeText = currentMode === 'single' ? '【單堂預約】' : '【雙月預約】';
+        let displayModeText = '【單堂預約】';
+        if (currentMode === 'bimonthly') displayModeText = '【雙月預約】';
+        if (currentMode === 'makeup') displayModeText = '【單堂補課】';
+        
         document.getElementById('time-display-date').innerText = `${displayModeText}\n起始日：${year}年 ${monthIdx + 1}月 ${day}日`;
         renderTimeSlots();
         goToPage('page-time');
@@ -460,6 +486,10 @@
                 btn.innerText = `${timeLabel} (已額滿)`;
             } else {
                 btn.innerText = `${timeLabel} (剩 ${remaining} 位)`;
+                if(currentMode === 'makeup') {
+                    btn.style.color = 'var(--success-color)';
+                    btn.style.borderColor = 'var(--success-color)';
+                }
                 btn.onclick = () => selectTime(slot.start, timeLabel);
             }
             container.appendChild(btn);
@@ -470,13 +500,19 @@
         selectedTimeLabel = timeLabel;
         const finalDateKeys = selectedDatesArray.map(d => `${d}_${startTime}`);
         
-        document.getElementById('display-mode').innerText = currentMode === 'single' ? '方案：單堂預約' : '方案：雙月預約';
+        let modeDisplay = '方案：單堂預約';
+        if (currentMode === 'bimonthly') modeDisplay = '方案：雙月預約';
+        if (currentMode === 'makeup') modeDisplay = '方案：補課使用';
+        
+        document.getElementById('display-mode').innerText = modeDisplay;
         
         if (currentMode === 'bimonthly') {
             document.getElementById('display-date').innerHTML = `包含日期：<br>` + finalDateKeys.map(k => k.split('_')[0]).join(', ');
         } else {
             document.getElementById('display-date').innerText = `日期：` + finalDateKeys[0].split('_')[0];
         }
+        
+        document.getElementById('display-mode').style.color = currentMode === 'makeup' ? 'var(--success-color)' : 'var(--primary-color)';
         document.getElementById('display-time').innerText = timeLabel;
         
         document.getElementById('booking-form').dataset.keys = JSON.stringify(finalDateKeys);
@@ -486,7 +522,6 @@
 
     async function submitForm(event) {
         event.preventDefault(); 
-        
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
         showLoading("處理中，請稍候...");
@@ -511,13 +546,16 @@
                 body: JSON.stringify(payload)
             });
             const resData = await response.json();
-            const bookingId = resData.id; // 接收雲端產生的專屬 ID
+            const bookingId = resData.id; 
 
-            // 儲存到手機本地端，附上雲端 ID
+            if (currentMode === 'makeup') {
+                let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
+                localStorage.setItem('vivi_makeup_credits', Math.max(0, credits - 1));
+            }
+
             let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
-            
             let displayDateText = "";
-            if (currentMode === 'single') {
+            if (currentMode === 'single' || currentMode === 'makeup') {
                 displayDateText = finalDateKeys[0].split('_')[0];
             } else {
                 let m1 = parseInt(finalDateKeys[0].split('-')[1]);
@@ -526,7 +564,7 @@
             }
 
             myBookings.push({
-                uid: bookingId, // 供刪除時精確比對用
+                uid: bookingId, 
                 mode: currentMode,
                 dateText: displayDateText,
                 datesArray: finalDateKeys, 
@@ -536,7 +574,11 @@
             myBookings.sort((a, b) => b.timestamp - a.timestamp);
             localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
 
-            document.getElementById('result-mode').innerText = currentMode === 'single' ? '單堂預約' : '雙月預約';
+            let finalModeText = '單堂預約';
+            if (currentMode === 'bimonthly') finalModeText = '雙月預約';
+            if (currentMode === 'makeup') finalModeText = '單堂補課';
+
+            document.getElementById('result-mode').innerText = finalModeText;
             document.getElementById('result-date').innerText = displayDateText;
             document.getElementById('result-time').innerText = selectedTimeLabel;
             document.getElementById('result-name').innerText = name;
@@ -553,6 +595,7 @@
 
     function finishBooking() {
         fetchBookings();
+        if (currentMode === 'makeup') setMode('single');
         goToPage('page-home');
     }
 
@@ -567,22 +610,35 @@
         } else {
             myBookings.forEach(booking => {
                 const isBimonthly = booking.mode === 'bimonthly';
-                const tagClass = isBimonthly ? 'tag-bimonthly' : 'tag-single';
-                const tagText = isBimonthly ? '雙月預約' : '單堂';
+                const isMakeup = booking.mode === 'makeup';
+                
+                let tagClass = 'tag-single';
+                let tagText = '單堂';
+                if (isBimonthly) { tagClass = 'tag-bimonthly'; tagText = '雙月預約'; }
+                if (isMakeup) { tagClass = 'tag-makeup'; tagText = '補課'; }
                 
                 let detailsHtml = "";
                 if (isBimonthly && booking.datesArray) {
+                    let datesListHtml = booking.datesArray.map(k => {
+                        let shortDate = k.split('_')[0];
+                        return `
+                        <div class="detail-row">
+                            <span>${shortDate}</span>
+                            <button class="leave-btn" onclick="requestLeave(${booking.timestamp}, '${booking.uid}', '${k}')">請假</button>
+                        </div>`;
+                    }).join('');
+
                     detailsHtml = `
                         <button class="details-btn" onclick="const p = this.nextElementSibling; p.style.display = p.style.display === 'none' ? 'block' : 'none'; this.innerText = p.style.display === 'none' ? '詳細日期 ▼' : '隱藏日期 ▲';">詳細日期 ▼</button>
-                        <div class="details-content">
-                            ${booking.datesArray.map(k => k.split('_')[0]).join(', ')}
-                        </div>
+                        <div class="details-content">${datesListHtml}</div>
                     `;
                 }
 
-                const safeUid = booking.uid || ""; // 抓取專屬 ID
+                const safeUid = booking.uid || ""; 
                 const div = document.createElement('div');
                 div.className = 'booking-item';
+                
+                // 【修改】：加入傳遞 mode 參數給 deleteFullBooking
                 div.innerHTML = `
                     <div style="flex:1;">
                         <div class="booking-header">
@@ -592,7 +648,7 @@
                         <div class="booking-time">${booking.timeText}</div>
                         ${detailsHtml}
                     </div>
-                    <button class="delete-booking-btn" onclick="deleteBooking(${booking.timestamp}, '${safeUid}')">
+                    <button class="delete-booking-btn" onclick="deleteFullBooking(${booking.timestamp}, '${safeUid}', '${booking.mode}')" style="align-self: flex-start;">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                         取消
                     </button>
@@ -603,12 +659,40 @@
         goToPage('page-my-bookings');
     }
 
-    // 呼叫雲端同步刪除 (精確利用 UID)
-    async function deleteBooking(timestamp, uid) {
-        if (!uid) {
-            alert("這筆預約是較早的舊紀錄，無法從此處直接取消，請直接聯繫工作室老師取消！");
-            return;
+    async function requestLeave(timestamp, uid, dateKeyToLeave) {
+        if(confirm(`確定要針對 ${dateKeyToLeave.split('_')[0]} 請假嗎？\n\n系統將會釋出該日名額，並發放 1 堂「補課額度」給您。`)) {
+            showLoading("處理請假中...");
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'leave', id: uid, leaveDate: dateKeyToLeave })
+                });
+
+                let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+                let targetBooking = myBookings.find(b => b.timestamp === timestamp);
+                if (targetBooking) {
+                    targetBooking.datesArray = targetBooking.datesArray.filter(d => d !== dateKeyToLeave);
+                }
+                localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
+
+                let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
+                localStorage.setItem('vivi_makeup_credits', credits + 1);
+
+                showMyBookings(); 
+                fetchBookings();  
+                alert("請假成功！您已獲得 1 堂補課額度。");
+            } catch (error) {
+                alert("請假失敗，請確認網路連線。");
+                console.error(error);
+            } finally {
+                hideLoading();
+            }
         }
+    }
+
+    // 【修改】：加入 mode 判斷，若取消補課則退還額度
+    async function deleteFullBooking(timestamp, uid, mode) {
+        if (!uid) { alert("此為舊紀錄，無法線上取消，請聯絡老師！"); return; }
 
         if(confirm("確定要取消這筆預約嗎？\n\n這將會同步釋出雲端試算表上的名額供其他人預約！")) {
             showLoading("正在取消預約...");
@@ -622,11 +706,17 @@
                 myBookings = myBookings.filter(b => b.timestamp !== timestamp);
                 localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
                 
+                // 【核心修改】：若取消的是「單堂補課」，自動退還 1 堂額度
+                if (mode === 'makeup') {
+                    let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
+                    localStorage.setItem('vivi_makeup_credits', credits + 1);
+                    alert("補課取消成功！已退還 1 堂補課額度。");
+                }
+
                 showMyBookings(); 
                 fetchBookings();  
             } catch (error) {
                 alert("取消失敗，請確認網路連線。");
-                console.error(error);
             } finally {
                 hideLoading();
             }
@@ -634,7 +724,7 @@
     }
 
     window.onload = () => {
-        // 一進網頁先畫出日曆結構，同時背景向雲端要資料
+        checkMakeUpCredits();
         renderCalendar(); 
         fetchBookings();
     };
