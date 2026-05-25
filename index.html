@@ -36,16 +36,25 @@
         .mode-btn.active { background: var(--primary-color); color: white; box-shadow: 0 4px 10px rgba(188, 163, 155, 0.4); }
         .mode-hint { font-size: 12px; color: var(--danger-color); text-align: center; margin-bottom: 15px; display: none; background: #fff5f5; padding: 8px; border-radius: 6px; }
         
-        /* 補課專用按鈕 */
         #btn-makeup { display: none; border-color: var(--success-color); color: var(--success-color); }
         #btn-makeup.active { background: var(--success-color); color: white; box-shadow: 0 4px 10px rgba(125, 162, 141, 0.4); }
 
-        .view-bookings-btn { width: 100%; padding: 15px; background-color: transparent; border: 1px dashed var(--primary-color); color: var(--dark-accent); border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .view-bookings-btn { width: 100%; padding: 15px; background-color: transparent; border: 1px dashed var(--primary-color); color: var(--dark-accent); border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; margin-bottom: 10px;}
         .view-bookings-btn:hover { background-color: rgba(188, 163, 155, 0.1); }
+        
+        .rules-btn { width: 100%; padding: 15px; background-color: #fcfcfc; border: 1px solid #eee; color: #666; border-radius: 12px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .rules-btn:hover { background-color: #f5f5f5; border-color: #ddd; }
 
         #loading-overlay { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 1000; justify-content: center; align-items: center; flex-direction: column; color: var(--dark-accent); font-weight: bold; font-size: 16px; }
         .spinner-icon { width: 40px; height: 40px; margin-bottom: 10px; animation: spin 2s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* 補課券選擇視窗 (Modal) */
+        #ticket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(248, 245, 242, 0.8); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; }
+        .ticket-modal-content { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(140, 115, 109, 0.15); }
+        .ticket-item-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: #fcfcfc; border: 1px solid var(--success-color); border-radius: 12px; text-align: left; cursor: pointer; transition: 0.2s; color: var(--success-color); font-weight: bold;}
+        .ticket-item-btn:hover { background: var(--success-color); color: white; }
+        .ticket-item-detail { font-size: 12px; font-weight: normal; margin-top: 5px; opacity: 0.8;}
 
         .page { display: none; animation: fadeIn 0.4s ease; }
         .page.active { display: block; }
@@ -64,7 +73,6 @@
         .day-cell.empty { cursor: default; }
         .day-cell:hover:not(.empty):not(.full):not(.past) { background-color: var(--primary-color); color: white; transform: scale(1.05); box-shadow: 0 4px 12px rgba(188, 163, 155, 0.4); }
         
-        /* 補課模式的日曆懸停顏色 */
         .mode-makeup-active .day-cell:hover:not(.empty):not(.full):not(.past) { background-color: var(--success-color); box-shadow: 0 4px 12px rgba(125, 162, 141, 0.4); }
 
         .day-cell.full { color: #ccc; cursor: not-allowed; text-decoration: line-through; }
@@ -121,6 +129,14 @@
         .footer-icon { width: 40px; height: 40px; margin-bottom: 15px; stroke: var(--dark-accent); }
         .footer-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: var(--dark-accent); line-height: 1.6; margin: 0; }
         .footer-author { font-size: 12px; color: #A8958F; margin-top: 10px; letter-spacing: 2px; text-transform: uppercase; }
+
+        /* 課程說明頁面專用樣式 */
+        .rules-content { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); font-size: 14px; line-height: 1.8; color: #555; }
+        .rules-content h3 { color: var(--dark-accent); font-family: 'Playfair Display', serif; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 25px; margin-bottom: 15px;}
+        .rules-content h3:first-child { margin-top: 0; }
+        .rules-content ul { padding-left: 20px; margin-bottom: 20px;}
+        .rules-content li { margin-bottom: 8px; }
+        .rules-content hr { border: none; border-top: 1px dashed #eee; margin: 20px 0; }
     </style>
 </head>
 <body>
@@ -149,16 +165,21 @@
                 <div class="mode-switcher">
                     <button id="btn-single" class="mode-btn active" onclick="setMode('single')">單堂預約</button>
                     <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約</button>
-                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課額度</button>
+                    <button id="btn-makeup" class="mode-btn" onclick="openTicketModal()">使用補課額度</button>
                 </div>
                 <div id="bimonthly-hint" class="mode-hint">雙月限定：單數月的第一週 (限週一/二)</div>
                 <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
-                    您有 <span id="credit-count" style="font-weight:bold;">0</span> 堂補課額度可用
+                    您有 <span id="credit-count" style="font-weight:bold;">0</span> 張補課券可使用<br>
+                    <span id="makeup-period-hint" style="font-size:11px; color:#666;"></span>
                 </div>
                 
                 <button class="view-bookings-btn" onclick="showMyBookings()">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
                     View My Bookings
+                </button>
+                <button class="rules-btn" onclick="goToPage('page-rules')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                    課程制度說明
                 </button>
             </div>
 
@@ -179,6 +200,66 @@
                 </svg>
                 <p class="footer-quote">"Physical fitness is the first requisite of happiness."</p>
                 <div class="footer-author">- Joseph Pilates</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ticket-modal">
+        <div class="ticket-modal-content">
+            <h3 style="margin-top:0; color:var(--dark-accent); font-family: 'Playfair Display', serif;">Select Makeup Credit</h3>
+            <p style="font-size:13px; color:#666; margin-bottom:15px;">請選擇您要使用的補課券：</p>
+            <div id="ticket-list"></div>
+            <button onclick="document.getElementById('ticket-modal').style.display='none';" style="width:100%; padding:12px; margin-top:15px; border-radius:12px; border:none; background:#f0f0f0; color:#666; cursor:pointer; font-weight:bold;">取消</button>
+        </div>
+    </div>
+
+    <div id="page-rules" class="page">
+        <div class="sub-page-container">
+            <button class="back-btn" onclick="goToPage('page-home')">← 返回首頁</button>
+            <h2 class="card-title" style="margin-bottom: 25px;">課程制度說明</h2>
+            
+            <div class="rules-content">
+                <h3>1｜期課期間請假制度</h3>
+                <ul>
+                    <li>若因個人因素無法出席，可自行尋找親友代課使用。</li>
+                    <li>代課者需提前告知老師姓名與聯絡方式，以利課程安排。</li>
+                    <li>代課僅限同等級課程使用，不可更換其他課型。</li>
+                    <li>若未提前告知，老師有權不開放現場更換學員。</li>
+                </ul>
+
+                <hr>
+
+                <h3>2｜期課補課制度</h3>
+                <ul>
+                    <li>期課期間請假，可於「當期課程內」安排補課。</li>
+                    <li>補課需依老師可開放時段安排，不保證原固定時段。</li>
+                    <li>若當期結束前仍未完成補課，剩餘堂數將以該堂課費用 50% 辦理退費。</li>
+                    <li>為維護班級穩定與上課品質：
+                        <ul>
+                            <li>一期最多可請假 2 次</li>
+                            <li>包含事假、病假及個人因素請假。</li>
+                        </ul>
+                    </li>
+                    <li>超過請假次數之課程，將視同正常上課完成，不另提供補課或退費。</li>
+                </ul>
+
+                <hr>
+
+                <h3>3｜單堂約課制度</h3>
+                <ul>
+                    <li>可依個人時間彈性預約單堂課程。</li>
+                    <li>單堂課需提前預約與付款完成，才算保留名額。</li>
+                    <li>單堂課程不適用期課保留、補課與退費制度。</li>
+                    <li>若臨時取消，依教室請假規範辦理。</li>
+                </ul>
+
+                <hr>
+
+                <h3>補充說明</h3>
+                <ul>
+                    <li>為維持每位學員的固定位置與課程品質，期課制會優先保留固定時段學員。</li>
+                    <li>器械課程因名額有限，請大家協助遵守請假與補課規範，謝謝大家的理解與配合❤️</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -263,7 +344,8 @@
         3: [], 4: [], 5: [], 6: [], 0: [] 
     };
 
-    let currentMode = 'single'; // 'single', 'bimonthly', 'makeup'
+    let currentMode = 'single'; 
+    let activeMakeupCredit = null; 
     let selectedDateStr = "";      
     let selectedDayOfWeek = 0;     
     let selectedDatesArray = [];   
@@ -289,16 +371,24 @@
         window.scrollTo(0, 0); 
     }
 
+    // 檢查補課券數量並清理過期券
     function checkMakeUpCredits() {
-        let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
+        let rawCredits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+        const todayStr = new Date().toISOString().split('T')[0];
+        let validCredits = rawCredits.filter(c => c.endDate >= todayStr);
+        localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(validCredits));
+        
         const makeupBtn = document.getElementById('btn-makeup');
         const makeupHint = document.getElementById('makeup-hint');
         const creditCount = document.getElementById('credit-count');
         
-        if (credits > 0) {
+        if (validCredits.length > 0) {
             makeupBtn.style.display = 'block';
-            creditCount.innerText = credits;
-            if (currentMode === 'makeup') makeupHint.style.display = 'block';
+            creditCount.innerText = validCredits.length;
+            if (currentMode === 'makeup' && activeMakeupCredit) {
+                makeupHint.style.display = 'block';
+                document.getElementById('makeup-period-hint').innerText = `(${activeMakeupCredit.monthLabel} 補課券，效期至 ${activeMakeupCredit.endDate})`;
+            }
         } else {
             makeupBtn.style.display = 'none';
             makeupHint.style.display = 'none';
@@ -306,22 +396,64 @@
         }
     }
 
+    // 打開補課券選擇 Modal
+    function openTicketModal() {
+        let validCredits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+        if(validCredits.length === 0) return;
+
+        const listContainer = document.getElementById('ticket-list');
+        listContainer.innerHTML = '';
+
+        validCredits.forEach(ticket => {
+            const btn = document.createElement('button');
+            btn.className = 'ticket-item-btn';
+            btn.innerHTML = `
+                ${ticket.monthLabel} 補課券
+                <div class="ticket-item-detail">
+                    原時段：星期${['日','一','二','三','四','五','六'][ticket.originalDayOfWeek]} ${ticket.originalStartTime}<br>
+                    使用期限：${ticket.endDate}
+                </div>
+            `;
+            btn.onclick = () => activateMakeupMode(ticket);
+            listContainer.appendChild(btn);
+        });
+
+        document.getElementById('ticket-modal').style.display = 'flex';
+    }
+
+    // 確認使用特定補課券
+    function activateMakeupMode(ticket) {
+        activeMakeupCredit = ticket;
+        document.getElementById('ticket-modal').style.display = 'none';
+        
+        currentMode = 'makeup';
+        document.getElementById('btn-single').className = 'mode-btn';
+        document.getElementById('btn-bimonthly').className = 'mode-btn';
+        document.getElementById('btn-makeup').className = 'mode-btn active';
+        
+        document.getElementById('bimonthly-hint').style.display = 'none';
+        document.getElementById('makeup-hint').style.display = 'block';
+        document.getElementById('makeup-period-hint').innerText = `(${ticket.monthLabel} 補課券，效期至 ${ticket.endDate})`;
+        
+        document.getElementById('app-container').classList.add('mode-makeup-active');
+        renderCalendar();
+    }
+
     function setMode(mode) {
+        if (mode === 'makeup') {
+            openTicketModal();
+            return;
+        }
+
+        activeMakeupCredit = null; 
         currentMode = mode;
         document.getElementById('btn-single').className = mode === 'single' ? 'mode-btn active' : 'mode-btn';
         document.getElementById('btn-bimonthly').className = mode === 'bimonthly' ? 'mode-btn active' : 'mode-btn';
-        document.getElementById('btn-makeup').className = mode === 'makeup' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-makeup').className = 'mode-btn';
         
         document.getElementById('bimonthly-hint').style.display = mode === 'bimonthly' ? 'block' : 'none';
-        
-        const appContainer = document.getElementById('app-container');
-        if (mode === 'makeup') {
-            document.getElementById('makeup-hint').style.display = 'block';
-            appContainer.classList.add('mode-makeup-active');
-        } else {
-            document.getElementById('makeup-hint').style.display = 'none';
-            appContainer.classList.remove('mode-makeup-active');
-        }
+        document.getElementById('makeup-hint').style.display = 'none';
+        document.getElementById('app-container').classList.remove('mode-makeup-active');
         renderCalendar(); 
     }
 
@@ -405,6 +537,15 @@
             } else if (currentMode === 'bimonthly' && (!isOddMonth || !isFirstWeek || !isMonOrTue)) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
+            } else if (currentMode === 'makeup' && activeMakeupCredit) {
+                if (dateKey > activeMakeupCredit.endDate || dateKey < activeMakeupCredit.startDate) {
+                    cell.className = 'day-cell past';
+                    cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">非效期</div>`;
+                } else {
+                    cell.className = 'day-cell';
+                    cell.innerHTML = `${day}<div class="availability">●</div>`;
+                    cell.onclick = () => selectDate(dateKey, currentRenderYear, currentRenderMonth, day, dayOfWeek);
+                }
             } else {
                 cell.className = 'day-cell';
                 cell.innerHTML = `${day}<div class="availability">●</div>`;
@@ -448,7 +589,7 @@
         if (currentMode === 'bimonthly') displayModeText = '【雙月預約】';
         if (currentMode === 'makeup') displayModeText = '【單堂補課】';
         
-        document.getElementById('time-display-date').innerText = `${displayModeText}\n起始日：${year}年 ${monthIdx + 1}月 ${day}日`;
+        document.getElementById('time-display-date').innerText = `${displayModeText}\n日期：${year}年 ${monthIdx + 1}月 ${day}日`;
         renderTimeSlots();
         goToPage('page-time');
     }
@@ -465,6 +606,17 @@
         slots.forEach(slot => {
             const timeLabel = `${slot.start} - ${slot.end}`;
             
+            if (currentMode === 'makeup' && activeMakeupCredit) {
+                if (selectedDayOfWeek === activeMakeupCredit.originalDayOfWeek && slot.start === activeMakeupCredit.originalStartTime) {
+                    const btn = document.createElement('button');
+                    btn.className = 'time-slot-btn';
+                    btn.disabled = true;
+                    btn.innerText = `${timeLabel} (原時段不可選)`;
+                    container.appendChild(btn);
+                    return; 
+                }
+            }
+
             let maxBooked = 0;
             selectedDatesArray.forEach(d => {
                 let dateKey = `${d}_${slot.start}`;
@@ -548,28 +700,34 @@
             const resData = await response.json();
             const bookingId = resData.id; 
 
-            if (currentMode === 'makeup') {
-                let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
-                localStorage.setItem('vivi_makeup_credits', Math.max(0, credits - 1));
+            if (currentMode === 'makeup' && activeMakeupCredit) {
+                let validCredits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+                validCredits = validCredits.filter(c => c.ticketId !== activeMakeupCredit.ticketId);
+                localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(validCredits));
             }
 
             let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
             let displayDateText = "";
+            let monthLabelStr = "";
+
             if (currentMode === 'single' || currentMode === 'makeup') {
                 displayDateText = finalDateKeys[0].split('_')[0];
             } else {
                 let m1 = parseInt(finalDateKeys[0].split('-')[1]);
                 let m2 = m1 + 1 > 12 ? 1 : m1 + 1;
-                displayDateText = `${finalDateKeys[0].split('_')[0]} 起 (${m1}-${m2}月)`;
+                monthLabelStr = `${m1}-${m2}月`;
+                displayDateText = `${finalDateKeys[0].split('_')[0]} 起 (${monthLabelStr})`;
             }
 
             myBookings.push({
                 uid: bookingId, 
                 mode: currentMode,
                 dateText: displayDateText,
+                monthLabel: monthLabelStr, 
                 datesArray: finalDateKeys, 
                 timeText: selectedTimeLabel,
-                timestamp: new Date().getTime()
+                timestamp: new Date().getTime(),
+                parentCredit: activeMakeupCredit 
             });
             myBookings.sort((a, b) => b.timestamp - a.timestamp);
             localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
@@ -595,7 +753,7 @@
 
     function finishBooking() {
         fetchBookings();
-        if (currentMode === 'makeup') setMode('single');
+        if (currentMode === 'makeup') setMode('single'); 
         goToPage('page-home');
     }
 
@@ -638,7 +796,6 @@
                 const div = document.createElement('div');
                 div.className = 'booking-item';
                 
-                // 【修改】：加入傳遞 mode 參數給 deleteFullBooking
                 div.innerHTML = `
                     <div style="flex:1;">
                         <div class="booking-header">
@@ -660,7 +817,7 @@
     }
 
     async function requestLeave(timestamp, uid, dateKeyToLeave) {
-        if(confirm(`確定要針對 ${dateKeyToLeave.split('_')[0]} 請假嗎？\n\n系統將會釋出該日名額，並發放 1 堂「補課額度」給您。`)) {
+        if(confirm(`確定要針對 ${dateKeyToLeave.split('_')[0]} 請假嗎？\n\n系統將釋出該日名額，並發放一張「補課券」給您（限本期內使用）。`)) {
             showLoading("處理請假中...");
             try {
                 await fetch(API_URL, {
@@ -670,17 +827,49 @@
 
                 let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
                 let targetBooking = myBookings.find(b => b.timestamp === timestamp);
+                
                 if (targetBooking) {
+                    // 1. 先將請假當日從上課名單中移除
                     targetBooking.datesArray = targetBooking.datesArray.filter(d => d !== dateKeyToLeave);
+                    
+                    // ==========================================
+                    // 2. 修正：精準計算該「雙月週期」的起訖日與原時段
+                    // ==========================================
+                    let leaveDateOnly = dateKeyToLeave.split('_')[0]; // ex: "2023-09-01"
+                    let originalStartTime = dateKeyToLeave.split('_')[1]; // ex: "07:50"
+                    let originalDayOfWeek = new Date(leaveDateOnly).getDay(); // ex: 2 (週二)
+                    
+                    let leaveDateObj = new Date(leaveDateOnly);
+                    let y = leaveDateObj.getFullYear();
+                    let m = leaveDateObj.getMonth() + 1; // 轉換為 1~12 月
+                    let startOddMonth = m % 2 === 0 ? m - 1 : m; // 自動抓取該雙月的單數月 (例如 10月請假，會推回 9月)
+
+                    // 該雙月的 1 號 (效期開始)
+                    let periodStart = new Date(y, startOddMonth - 1, 1);
+                    let ticketStartDate = periodStart.getFullYear() + "-" + String(periodStart.getMonth() + 1).padStart(2, '0') + "-01";
+
+                    // 該雙月的最後一天 (效期結束)
+                    let periodEnd = new Date(y, startOddMonth + 1, 0); 
+                    let ticketEndDate = periodEnd.getFullYear() + "-" + String(periodEnd.getMonth() + 1).padStart(2, '0') + "-" + String(periodEnd.getDate()).padStart(2, '0');
+                    
+                    // 3. 發放補課券
+                    let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+                    credits.push({
+                        ticketId: "TKT_" + new Date().getTime().toString(), // 券的專屬識別碼
+                        parentUid: uid, 
+                        monthLabel: targetBooking.monthLabel, 
+                        startDate: ticketStartDate,
+                        endDate: ticketEndDate,
+                        originalDayOfWeek: originalDayOfWeek,
+                        originalStartTime: originalStartTime
+                    });
+                    localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(credits));
                 }
                 localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
 
-                let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
-                localStorage.setItem('vivi_makeup_credits', credits + 1);
-
                 showMyBookings(); 
                 fetchBookings();  
-                alert("請假成功！您已獲得 1 堂補課額度。");
+                alert("請假成功！您已獲得 1 張補課券。");
             } catch (error) {
                 alert("請假失敗，請確認網路連線。");
                 console.error(error);
@@ -690,11 +879,15 @@
         }
     }
 
-    // 【修改】：加入 mode 判斷，若取消補課則退還額度
     async function deleteFullBooking(timestamp, uid, mode) {
         if (!uid) { alert("此為舊紀錄，無法線上取消，請聯絡老師！"); return; }
 
-        if(confirm("確定要取消這筆預約嗎？\n\n這將會同步釋出雲端試算表上的名額供其他人預約！")) {
+        let msg = "確定要取消這筆預約嗎？\n\n這將會同步釋出雲端試算表上的名額供其他人預約！";
+        if (mode === 'bimonthly') {
+            msg = "確定要取消整期「雙月預約」嗎？\n\n注意：這會連同您已獲得的補課券一併註銷！";
+        }
+
+        if(confirm(msg)) {
             showLoading("正在取消預約...");
             try {
                 await fetch(API_URL, {
@@ -703,14 +896,23 @@
                 });
 
                 let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+                let targetBooking = myBookings.find(b => b.timestamp === timestamp);
                 myBookings = myBookings.filter(b => b.timestamp !== timestamp);
                 localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
                 
-                // 【核心修改】：若取消的是「單堂補課」，自動退還 1 堂額度
-                if (mode === 'makeup') {
-                    let credits = parseInt(localStorage.getItem('vivi_makeup_credits')) || 0;
-                    localStorage.setItem('vivi_makeup_credits', credits + 1);
-                    alert("補課取消成功！已退還 1 堂補課額度。");
+                // 如果取消的是補課，把券還回去
+                if (mode === 'makeup' && targetBooking && targetBooking.parentCredit) {
+                    let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+                    credits.push(targetBooking.parentCredit);
+                    localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(credits));
+                    alert("補課取消成功！已退還 1 張補課券。");
+                }
+
+                // 如果取消的是雙月預約，連帶註銷該期產生的補課券
+                if (mode === 'bimonthly') {
+                    let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+                    let filteredCredits = credits.filter(c => c.parentUid !== uid); 
+                    localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(filteredCredits));
                 }
 
                 showMyBookings(); 
