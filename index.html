@@ -57,7 +57,7 @@
         .agree-container input { width: 18px; height: 18px; cursor: pointer; }
         .agree-container label { cursor: pointer; font-weight: bold; color: var(--dark-accent); font-size: 15px; margin: 0; }
 
-        /* 補課券選擇視窗 (Modal) */
+        /* 補課券選擇視窗 */
         #ticket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(248, 245, 242, 0.8); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; }
         .ticket-modal-content { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(140, 115, 109, 0.15); }
         .ticket-item-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: #fcfcfc; border: 1px solid var(--success-color); border-radius: 12px; text-align: left; cursor: pointer; transition: 0.2s; color: var(--success-color); font-weight: bold;}
@@ -97,7 +97,6 @@
 
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: #555; }
-        /* 避免 radio 和 checkbox 受到 width 100% 影響 */
         input:not([type="radio"]):not([type="checkbox"]), textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; box-sizing: border-box; font-family: inherit; font-size: 15px; background-color: #fcfcfc; }
         input:focus, textarea:focus { outline: none; border-color: var(--primary-color); background-color: white; }
         textarea { resize: vertical; height: 100px; }
@@ -139,15 +138,15 @@
         .footer-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; color: var(--dark-accent); line-height: 1.6; margin: 0; }
         .footer-author { font-size: 12px; color: #A8958F; margin-top: 10px; letter-spacing: 2px; text-transform: uppercase; }
 
-        /* 課程說明頁面/Modal專用樣式 */
         .rules-content { font-size: 14px; line-height: 1.8; color: #555; }
         .rules-content h3 { color: var(--dark-accent); font-family: 'Playfair Display', serif; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 25px; margin-bottom: 15px;}
         .rules-content h3:first-child { margin-top: 0; }
         .rules-content ul { padding-left: 20px; margin-bottom: 20px;}
         .rules-content li { margin-bottom: 8px; }
         .rules-content hr { border: none; border-top: 1px dashed #eee; margin: 20px 0; }
-        
         .page-rules-wrapper { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        
+        .important-info-box { background-color: #fffaf0; border-left: 4px solid #f39c12; padding: 12px 15px; border-radius: 4px; margin-bottom: 25px; font-size: 13px; color: #666; line-height: 1.6; text-align: left; }
     </style>
 </head>
 <body>
@@ -231,7 +230,7 @@
                 <div class="mode-switcher">
                     <button id="btn-single" class="mode-btn active" onclick="setMode('single')">單堂預約</button>
                     <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約</button>
-                    <button id="btn-makeup" class="mode-btn" onclick="openTicketModal()">使用補課額度</button>
+                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課額度</button>
                 </div>
                 <div id="bimonthly-hint" class="mode-hint">雙月限定：單數月的第一週 (限週一/二)</div>
                 <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
@@ -283,7 +282,6 @@
         <div class="sub-page-container">
             <button class="back-btn" onclick="goToPage('page-home')">← 返回首頁</button>
             <h2 class="card-title" style="margin-bottom: 25px;">課程制度說明</h2>
-            
             <div class="page-rules-wrapper rules-content">
                 <h3>1｜費用計算與繳費</h3>
                 <ul>
@@ -379,14 +377,14 @@
                     </div>
                 </div>
                 
-                <div class="form-group">
+                <div class="form-group" id="payment-section">
                     <label>付款方式 Payment Method</label>
                     <div style="display:flex; gap: 20px; align-items:center; margin-bottom: 10px;">
                         <label style="font-weight:normal; display:flex; align-items:center; gap:5px;">
-                            <input type="radio" name="payment" value="轉帳" required onchange="togglePaymentInfo()"> 轉帳
+                            <input type="radio" name="payment" value="轉帳" onchange="togglePaymentInfo()"> 轉帳
                         </label>
                         <label style="font-weight:normal; display:flex; align-items:center; gap:5px;">
-                            <input type="radio" name="payment" value="現金" required onchange="togglePaymentInfo()"> 現金
+                            <input type="radio" name="payment" value="現金" onchange="togglePaymentInfo()"> 現金
                         </label>
                     </div>
                 </div>
@@ -405,7 +403,7 @@
                     <textarea id="notes" placeholder="有無特殊身體狀況或其他需求..."></textarea>
                 </div>
                 
-                <div style="background-color: #fffaf0; border-left: 4px solid #f39c12; padding: 12px 15px; border-radius: 4px; margin-bottom: 25px; font-size: 13px; color: #666; line-height: 1.6;">
+                <div class="important-info-box">
                     <strong style="color: #d35400;">⚠️ 重要資訊：</strong><br>
                     預約後請主動私訊官方賴 (LINE ID: <strong>york1040041</strong>) 並說明已完成檔期預約以及付款方式。<br>
                     (如果為轉帳，請提供匯款截圖畫面，謝謝！)
@@ -431,16 +429,20 @@
                 <div class="info-row"><div class="info-label">姓名</div><div class="info-value" id="result-name"></div></div>
             </div>
 
+            <div class="important-info-box">
+                <strong style="color: #d35400;">⚠️ 重要資訊：</strong><br>
+                預約後請主動私訊官方賴 (LINE ID: <strong>york1040041</strong>) 並說明已完成檔期預約以及付款方式。<br>
+                (如果為轉帳，請提供匯款截圖畫面，謝謝！)
+            </div>
+
             <button class="submit-btn" onclick="finishBooking()">返回首頁 Home</button>
         </div>
     </div>
 </div>
 
 <script>
-    // ！！！！請務必確認這裡是您最新的 Google Web App 網址！！！！
     const API_URL = "https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec";
     const MAX_PEOPLE = 4;
-
     const SCHEDULE = {
         1: [{start: "06:30", end: "07:25"}, {start: "07:35", end: "08:30"}, {start: "08:45", end: "09:40"}], 
         2: [{start: "07:50", end: "08:45"}, {start: "09:00", end: "09:55"}],
@@ -459,12 +461,11 @@
     let currentRenderYear = realToday.getFullYear();
     let currentRenderMonth = realToday.getMonth(); 
 
-    // 處理初次載入的規範同意 Modal
+    // 初始化與同步
     window.onload = () => {
         if (!sessionStorage.getItem('vivi_rules_agreed')) {
             document.getElementById('initial-rules-modal').style.display = 'flex';
         }
-        checkMakeUpCredits();
         renderCalendar(); 
         fetchBookings();
     };
@@ -509,6 +510,52 @@
         window.scrollTo(0, 0); 
     }
 
+    // 【雙向同步機制】：檢查老闆是否從後台刪除了某個課程
+    async function fetchBookings() {
+        showLoading("連線至伺服器...");
+        try {
+            const response = await fetch(API_URL + "?t=" + new Date().getTime());
+            const resData = await response.json();
+            cloudBookingData = resData.counts;
+            const activeCloudIds = resData.activeIds || [];
+
+            // 同步本地資料
+            let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+            let originalLen = myBookings.length;
+            
+            myBookings = myBookings.filter(b => {
+                if (b.uid && !activeCloudIds.includes(b.uid)) {
+                    if (b.mode === 'makeup' && b.parentCredit) {
+                        let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+                        credits.push(b.parentCredit);
+                        localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(credits));
+                    }
+                    if (b.mode === 'bimonthly') {
+                        let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
+                        credits = credits.filter(c => c.parentUid !== b.uid);
+                        localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(credits));
+                    }
+                    return false; 
+                }
+                return true; 
+            });
+
+            if (myBookings.length !== originalLen) {
+                localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
+                if(document.getElementById('page-my-bookings').classList.contains('active')) {
+                    showMyBookings();
+                }
+            }
+
+            checkMakeUpCredits();
+            renderCalendar(); 
+        } catch (error) {
+            console.error(error);
+        } finally {
+            hideLoading();
+        }
+    }
+
     function checkMakeUpCredits() {
         let rawCredits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
         const todayStr = new Date().toISOString().split('T')[0];
@@ -518,13 +565,14 @@
         const makeupBtn = document.getElementById('btn-makeup');
         const makeupHint = document.getElementById('makeup-hint');
         const creditCount = document.getElementById('credit-count');
+        const periodHint = document.getElementById('makeup-period-hint');
         
         if (validCredits.length > 0) {
             makeupBtn.style.display = 'block';
             creditCount.innerText = validCredits.length;
             if (currentMode === 'makeup' && activeMakeupCredit) {
                 makeupHint.style.display = 'block';
-                document.getElementById('makeup-period-hint').innerText = `(${activeMakeupCredit.monthLabel} 補課券，效期至 ${activeMakeupCredit.endDate})`;
+                periodHint.innerText = `(${activeMakeupCredit.monthLabel} 補課券，效期至 ${activeMakeupCredit.endDate})`;
             }
         } else {
             makeupBtn.style.display = 'none';
@@ -590,20 +638,6 @@
         document.getElementById('makeup-hint').style.display = 'none';
         document.getElementById('app-container').classList.remove('mode-makeup-active');
         renderCalendar(); 
-    }
-
-    async function fetchBookings() {
-        showLoading("連線至伺服器...");
-        try {
-            const response = await fetch(API_URL + "?t=" + new Date().getTime());
-            cloudBookingData = await response.json();
-            checkMakeUpCredits();
-            renderCalendar(); 
-        } catch (error) {
-            console.error(error);
-        } finally {
-            hideLoading();
-        }
     }
 
     function changeMonth(direction) {
@@ -673,6 +707,7 @@
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
             } else if (currentMode === 'makeup' && activeMakeupCredit) {
+                // 補課模式下，嚴格檢查該券的有效日期區間
                 if (dateKey > activeMakeupCredit.endDate || dateKey < activeMakeupCredit.startDate) {
                     cell.className = 'day-cell past';
                     cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">非效期</div>`;
@@ -741,6 +776,7 @@
         slots.forEach(slot => {
             const timeLabel = `${slot.start} - ${slot.end}`;
             
+            // 【修改 1】：原時段限制
             if (currentMode === 'makeup' && activeMakeupCredit) {
                 if (selectedDayOfWeek === activeMakeupCredit.originalDayOfWeek && slot.start === activeMakeupCredit.originalStartTime) {
                     const btn = document.createElement('button');
@@ -802,9 +838,11 @@
         document.getElementById('display-mode').style.color = currentMode === 'makeup' ? 'var(--success-color)' : 'var(--primary-color)';
         document.getElementById('display-time').innerText = timeLabel;
         
-        // 自動計算費用
+        // 費用計算處理
         let totalFee = 0;
         let feeText = "";
+        let isFree = false;
+        
         if (currentMode === 'bimonthly') {
             totalFee = finalDateKeys.length * 750;
             feeText = `NT$ ${totalFee} (${finalDateKeys.length}堂 x $750)`;
@@ -812,16 +850,27 @@
             totalFee = 800;
             feeText = `NT$ ${totalFee} (單堂 $800)`;
         } else if (currentMode === 'makeup') {
-            totalFee = 0;
-            feeText = `NT$ 0 (使用已扣除之補課額度)`;
+            feeText = `NT$ 0 (使用已扣除之補課券)`;
+            isFree = true;
         }
         
         document.getElementById('display-fee').innerText = feeText;
-        document.getElementById('booking-form').dataset.fee = feeText; // 存起來給送出時用
+        document.getElementById('booking-form').dataset.fee = feeText; 
+        
+        // 隱藏/顯示付款方式
+        const paymentSection = document.getElementById('payment-section');
+        const paymentRadios = document.querySelectorAll('input[name="payment"]');
+        if (isFree) {
+            paymentSection.style.display = 'none';
+            paymentRadios.forEach(r => r.required = false);
+            togglePaymentInfo(); // 確保隱藏轉帳資訊
+        } else {
+            paymentSection.style.display = 'block';
+            paymentRadios.forEach(r => r.required = true);
+        }
 
         document.getElementById('booking-form').dataset.keys = JSON.stringify(finalDateKeys);
         document.getElementById('booking-form').reset();
-        togglePaymentInfo(); // 重設時確保隱藏轉帳資訊
         goToPage('page-form');
     }
 
@@ -836,16 +885,16 @@
         const email = document.getElementById('email').value;
         const phone = document.getElementById('phone').value;
         const notes = document.getElementById('notes').value;
-        
-        // 抓取付款方式與費用
-        const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
-        const bankAcc = document.getElementById('bank-acc').value;
         const feeText = document.getElementById('booking-form').dataset.fee;
 
-        // 將費用及付款方式整合進備註欄位
-        let combinedNotes = `[費用: ${feeText} / 付款: ${paymentMethod}`;
-        if (paymentMethod === '轉帳' && bankAcc) {
-            combinedNotes += ` / 帳號末五碼: ${bankAcc}`;
+        let combinedNotes = `[費用: ${feeText}`;
+        if (currentMode !== 'makeup') {
+            const paymentMethod = document.querySelector('input[name="payment"]:checked').value;
+            const bankAcc = document.getElementById('bank-acc').value;
+            combinedNotes += ` / 付款: ${paymentMethod}`;
+            if (paymentMethod === '轉帳' && bankAcc) {
+                combinedNotes += ` / 末五碼: ${bankAcc}`;
+            }
         }
         combinedNotes += `]\n${notes}`;
 
@@ -998,11 +1047,12 @@
                 if (targetBooking) {
                     targetBooking.datesArray = targetBooking.datesArray.filter(d => d !== dateKeyToLeave);
                     
+                    // 為了確保補課券的起始日期永遠是該雙月期的第一天
                     let leaveDateOnly = dateKeyToLeave.split('_')[0]; 
                     let originalStartTime = dateKeyToLeave.split('_')[1]; 
-                    let originalDayOfWeek = new Date(leaveDateOnly).getDay(); 
-                    
                     let leaveDateObj = new Date(leaveDateOnly);
+                    let originalDayOfWeek = leaveDateObj.getDay(); 
+                    
                     let y = leaveDateObj.getFullYear();
                     let m = leaveDateObj.getMonth() + 1; 
                     let startOddMonth = m % 2 === 0 ? m - 1 : m; 
@@ -1081,6 +1131,27 @@
                 hideLoading();
             }
         }
+    }
+
+   window.onload = () => {
+        // 檢查暫存，如果沒有同意過規範，就將 modal 顯示出來
+        if (!sessionStorage.getItem('vivi_rules_agreed')) {
+            document.getElementById('initial-rules-modal').style.display = 'flex';
+        }
+        checkMakeUpCredits();
+        renderCalendar(); 
+        fetchBookings();
+    };
+    // 偵測核取方塊，打勾才能點擊開始約課
+    function toggleAgreeButton() {
+        const isChecked = document.getElementById('agree-initial-rules').checked;
+        document.getElementById('btn-start-booking').disabled = !isChecked;
+    }
+
+    // 點擊開始約課後，關閉視窗並記錄狀態
+    function confirmRulesAndStart() {
+        document.getElementById('initial-rules-modal').style.display = 'none';
+        sessionStorage.setItem('vivi_rules_agreed', 'true');
     }
 </script>
 </body>
