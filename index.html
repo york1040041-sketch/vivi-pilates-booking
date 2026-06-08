@@ -57,7 +57,7 @@
         .agree-container input { width: 18px; height: 18px; cursor: pointer; }
         .agree-container label { cursor: pointer; font-weight: bold; color: var(--dark-accent); font-size: 15px; margin: 0; }
 
-        /* 補課券選擇視窗 */
+        /* 補課券選擇視窗 (Modal) */
         #ticket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(248, 245, 242, 0.8); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; }
         .ticket-modal-content { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(140, 115, 109, 0.15); }
         .ticket-item-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: #fcfcfc; border: 1px solid var(--success-color); border-radius: 12px; text-align: left; cursor: pointer; transition: 0.2s; color: var(--success-color); font-weight: bold;}
@@ -168,7 +168,7 @@
                 <h3>1｜費用計算與繳費</h3>
                 <ul>
                     <li><strong>雙月預約期課：</strong> $750 / 堂。鼓勵穩定規律的練習，享有期課專屬優惠。系統會依該期實際排定之上課次數自動計算總費用。</li>
-                    <li><strong>單堂預約：</strong> $800 / 堂。適合時間較不固定的學員彈性安排。</li>
+                    <li><strong>單堂預約：</strong> $900 / 堂。適合時間較不固定的學員彈性安排。</li>
                     <li>預約後請於指定時間內完成繳費，以確保為您保留名額。</li>
                 </ul>
                 <hr>
@@ -187,7 +187,7 @@
                     <li>若當期結束前仍未完成補課，剩餘堂數將以該堂課費用 50% 辦理退費。</li>
                     <li>為維護班級穩定與上課品質：
                         <ul>
-                            <li>一期最多可請假 2 次</li>
+                            <li>一期最多可請假 1 次</li>
                             <li>包含事假、病假及個人因素請假。</li>
                         </ul>
                     </li>
@@ -230,7 +230,7 @@
                 <div class="mode-switcher">
                     <button id="btn-single" class="mode-btn active" onclick="setMode('single')">單堂預約</button>
                     <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約</button>
-                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課額度</button>
+                    <button id="btn-makeup" class="mode-btn" onclick="openTicketModal()">使用補課額度</button>
                 </div>
                 <div id="bimonthly-hint" class="mode-hint">雙月限定：單數月的第一週 (限週一/二)</div>
                 <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
@@ -286,7 +286,7 @@
                 <h3>1｜費用計算與繳費</h3>
                 <ul>
                     <li><strong>雙月預約期課：</strong> $750 / 堂。鼓勵穩定規律的練習，享有期課專屬優惠。系統會依該期實際排定之上課次數自動計算總費用。</li>
-                    <li><strong>單堂預約：</strong> $800 / 堂。適合時間較不固定的學員彈性安排。</li>
+                    <li><strong>單堂預約：</strong> $900 / 堂。適合時間較不固定的學員彈性安排。</li>
                     <li>預約後請於指定時間內完成繳費，以確保為您保留名額。</li>
                 </ul>
                 <hr>
@@ -305,7 +305,7 @@
                     <li>若當期結束前仍未完成補課，剩餘堂數將以該堂課費用 50% 辦理退費。</li>
                     <li>為維護班級穩定與上課品質：
                         <ul>
-                            <li>一期最多可請假 2 次</li>
+                            <li>一期最多可請假 1 次</li>
                             <li>包含事假、病假及個人因素請假。</li>
                         </ul>
                     </li>
@@ -405,7 +405,7 @@
                 
                 <div class="important-info-box">
                     <strong style="color: #d35400;">⚠️ 重要資訊：</strong><br>
-                    預約後請主動私訊官方賴 (LINE ID: <strong>york1040041</strong>) 並說明已完成檔期預約以及付款方式。<br>
+                    預約後請主動私訊官方賴 (LINE ID: <strong>@149swobg</strong>) 並說明已完成檔期預約以及付款方式。<br>
                     (如果為轉帳，請提供匯款截圖畫面，謝謝！)
                 </div>
 
@@ -431,7 +431,7 @@
 
             <div class="important-info-box">
                 <strong style="color: #d35400;">⚠️ 重要資訊：</strong><br>
-                預約後請主動私訊官方賴 (LINE ID: <strong>york1040041</strong>) 並說明已完成檔期預約以及付款方式。<br>
+                預約後請主動私訊官方賴 (LINE ID: <strong>@149swobg</strong>) 並說明已完成檔期預約以及付款方式。<br>
                 (如果為轉帳，請提供匯款截圖畫面，謝謝！)
             </div>
 
@@ -707,7 +707,6 @@
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
             } else if (currentMode === 'makeup' && activeMakeupCredit) {
-                // 補課模式下，嚴格檢查該券的有效日期區間
                 if (dateKey > activeMakeupCredit.endDate || dateKey < activeMakeupCredit.startDate) {
                     cell.className = 'day-cell past';
                     cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">非效期</div>`;
@@ -776,7 +775,6 @@
         slots.forEach(slot => {
             const timeLabel = `${slot.start} - ${slot.end}`;
             
-            // 【修改 1】：原時段限制
             if (currentMode === 'makeup' && activeMakeupCredit) {
                 if (selectedDayOfWeek === activeMakeupCredit.originalDayOfWeek && slot.start === activeMakeupCredit.originalStartTime) {
                     const btn = document.createElement('button');
@@ -847,8 +845,8 @@
             totalFee = finalDateKeys.length * 750;
             feeText = `NT$ ${totalFee} (${finalDateKeys.length}堂 x $750)`;
         } else if (currentMode === 'single') {
-            totalFee = 800;
-            feeText = `NT$ ${totalFee} (單堂 $800)`;
+            totalFee = 900;
+            feeText = `NT$ ${totalFee} (單堂 $900)`;
         } else if (currentMode === 'makeup') {
             feeText = `NT$ 0 (使用已扣除之補課券)`;
             isFree = true;
@@ -943,7 +941,8 @@
                 datesArray: finalDateKeys, 
                 timeText: selectedTimeLabel,
                 timestamp: new Date().getTime(),
-                parentCredit: activeMakeupCredit 
+                parentCredit: activeMakeupCredit,
+                leaveCount: 0 
             });
             myBookings.sort((a, b) => b.timestamp - a.timestamp);
             localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
@@ -995,10 +994,14 @@
                 if (isBimonthly && booking.datesArray) {
                     let datesListHtml = booking.datesArray.map(k => {
                         let shortDate = k.split('_')[0];
+                        let leaveActionHtml = (booking.leaveCount || 0) >= 1 
+                            ? `<span style="font-size:12px; color:#ccc;">已達上限</span>`
+                            : `<button class="leave-btn" onclick="requestLeave(${booking.timestamp}, '${booking.uid}', '${k}')">請假</button>`;
+
                         return `
                         <div class="detail-row">
                             <span>${shortDate}</span>
-                            <button class="leave-btn" onclick="requestLeave(${booking.timestamp}, '${booking.uid}', '${k}')">請假</button>
+                            ${leaveActionHtml}
                         </div>`;
                     }).join('');
 
@@ -1033,6 +1036,14 @@
     }
 
     async function requestLeave(timestamp, uid, dateKeyToLeave) {
+        let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+        let targetBooking = myBookings.find(b => b.timestamp === timestamp);
+        
+        if (targetBooking && (targetBooking.leaveCount || 0) >= 1) {
+            alert("您已達到本期「雙月預約」的請假上限（最多 1 次）！");
+            return;
+        }
+
         if(confirm(`確定要針對 ${dateKeyToLeave.split('_')[0]} 請假嗎？\n\n系統將釋出該日名額，並發放一張「補課券」給您（限本期內使用）。`)) {
             showLoading("處理請假中...");
             try {
@@ -1041,16 +1052,16 @@
                     body: JSON.stringify({ action: 'leave', id: uid, leaveDate: dateKeyToLeave })
                 });
 
-                let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
-                let targetBooking = myBookings.find(b => b.timestamp === timestamp);
-                
+                myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+                targetBooking = myBookings.find(b => b.timestamp === timestamp);
+
                 if (targetBooking) {
                     targetBooking.datesArray = targetBooking.datesArray.filter(d => d !== dateKeyToLeave);
+                    targetBooking.leaveCount = (targetBooking.leaveCount || 0) + 1; 
                     
-                    // 為了確保補課券的起始日期永遠是該雙月期的第一天
-                    let leaveDateOnly = dateKeyToLeave.split('_')[0]; 
+                    let startDateStr = targetBooking.datesArray.length > 0 ? targetBooking.datesArray[0].split('_')[0] : new Date().toISOString().split('T')[0];
                     let originalStartTime = dateKeyToLeave.split('_')[1]; 
-                    let leaveDateObj = new Date(leaveDateOnly);
+                    let leaveDateObj = new Date(dateKeyToLeave.split('_')[0]);
                     let originalDayOfWeek = leaveDateObj.getDay(); 
                     
                     let y = leaveDateObj.getFullYear();
@@ -1131,27 +1142,6 @@
                 hideLoading();
             }
         }
-    }
-
-   window.onload = () => {
-        // 檢查暫存，如果沒有同意過規範，就將 modal 顯示出來
-        if (!sessionStorage.getItem('vivi_rules_agreed')) {
-            document.getElementById('initial-rules-modal').style.display = 'flex';
-        }
-        checkMakeUpCredits();
-        renderCalendar(); 
-        fetchBookings();
-    };
-    // 偵測核取方塊，打勾才能點擊開始約課
-    function toggleAgreeButton() {
-        const isChecked = document.getElementById('agree-initial-rules').checked;
-        document.getElementById('btn-start-booking').disabled = !isChecked;
-    }
-
-    // 點擊開始約課後，關閉視窗並記錄狀態
-    function confirmRulesAndStart() {
-        document.getElementById('initial-rules-modal').style.display = 'none';
-        sessionStorage.setItem('vivi_rules_agreed', 'true');
     }
 </script>
 </body>
