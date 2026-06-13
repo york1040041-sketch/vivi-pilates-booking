@@ -494,8 +494,8 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec";
     const MAX_PEOPLE = 4;
     const SCHEDULE = {
-        1: [{start: "06:30", end: "07:25"}, {start: "07:35", end: "08:30"}, {start: "08:45", end: "09:40"}], 
-        2: [{start: "07:50", end: "08:45"}, {start: "09:00", end: "09:55"}],
+        1: [{start: "18:30", end: "19:25"}, {start: "19:35", end: "20:30"}, {start: "20:45", end: "21:40"}], 
+        2: [{start: "19:50", end: "20:45"}, {start: "21:00", end: "21:55"}],
         3: [], 4: [], 5: [], 6: [], 0: [] 
     };
 
@@ -510,7 +510,7 @@
 
     // 測試區塊保持原樣
     const realToday = new Date();
-    //const realToday = new Date('2026-06-20T10:00:00');
+    //const realToday = new Date('2026-07-14T12:00:00');
     let currentRenderYear = realToday.getFullYear();
     let currentRenderMonth = realToday.getMonth(); 
 
@@ -1067,6 +1067,7 @@
             myBookings.forEach(booking => {
                 const isBimonthly = booking.mode === 'bimonthly';
                 const isMakeup = booking.mode === 'makeup';
+                const isSingle = booking.mode === 'single';
                 
                 let tagClass = 'tag-single';
                 let tagText = '單堂';
@@ -1081,6 +1082,7 @@
                         let shortDate = k.split('_')[0];
                         let classTime = k.split('_')[1];
                         
+                        // 檢查 12 小時限制
                         let classDateObj = new Date(`${shortDate.replace(/-/g, '/')} ${classTime}:00`);
                         let hoursDiff = (classDateObj.getTime() - realToday.getTime()) / (1000 * 60 * 60);
                         
@@ -1112,7 +1114,34 @@
                     `;
                 }
 
+                // ✨ 新增：計算整筆訂單「第一堂課」的時間差，用來限制「取消」按鈕
+                let firstClassKey = booking.datesArray[0]; 
+                let firstDate = firstClassKey.split('_')[0];
+                let firstTime = firstClassKey.split('_')[1];
+                let firstClassDateObj = new Date(`${firstDate.replace(/-/g, '/')} ${firstTime}:00`);
+                let firstClassHoursDiff = (firstClassDateObj.getTime() - realToday.getTime()) / (1000 * 60 * 60);
+
+                let canCancel = true;
+                let cancelReason = "";
+
+                // 單堂/補課，若低於12小時就不可取消
+                if (!isBimonthly && firstClassHoursDiff < 12) {
+                    canCancel = false;
+                    cancelReason = "逾時";
+                }
+                // 雙月期課，若整期已經快開始了(或已開始)，也不可線上直接取消整期
+                if (isBimonthly && firstClassHoursDiff < 12) {
+                    canCancel = false;
+                    cancelReason = "逾時/已開課";
+                }
+
                 const safeUid = booking.uid || ""; 
+                let cancelActionHtml = canCancel 
+                    ? `<button class="delete-booking-btn" onclick="deleteFullBooking(${booking.timestamp}, '${safeUid}', '${booking.mode}')" style="align-self: flex-start;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg> 取消
+                       </button>`
+                    : `<span style="font-size:12px; color:var(--danger-color); align-self: flex-start; padding: 8px 0;">不可取消(${cancelReason})</span>`;
+
                 const div = document.createElement('div');
                 div.className = 'booking-item';
                 
@@ -1125,10 +1154,7 @@
                         <div class="booking-time">${booking.timeText}</div>
                         ${detailsHtml}
                     </div>
-                    <button class="delete-booking-btn" onclick="deleteFullBooking(${booking.timestamp}, '${safeUid}', '${booking.mode}')" style="align-self: flex-start;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                        取消
-                    </button>
+                    ${cancelActionHtml}
                 `;
                 container.appendChild(div);
             });
