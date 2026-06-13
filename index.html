@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VIVI PILATES 線上預約</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap');
+        @import url('https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec');
 
         :root {
             --primary-color: #BCA39B; 
@@ -49,7 +49,6 @@
         .spinner-icon { width: 40px; height: 40px; margin-bottom: 10px; animation: spin 2s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* 初次開啟的制度同意視窗 */
         #initial-rules-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); z-index: 3000; justify-content: center; align-items: center; }
         .initial-rules-content { background: white; width: 85%; max-width: 450px; max-height: 85vh; padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); overflow-y: auto; display: flex; flex-direction: column; }
         .initial-rules-scroll { overflow-y: auto; flex: 1; margin-bottom: 15px; padding-right: 5px; }
@@ -57,7 +56,6 @@
         .agree-container input { width: 18px; height: 18px; cursor: pointer; }
         .agree-container label { cursor: pointer; font-weight: bold; color: var(--dark-accent); font-size: 15px; margin: 0; }
 
-        /* 補課券選擇視窗 (Modal) */
         #ticket-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(248, 245, 242, 0.8); backdrop-filter: blur(4px); z-index: 2000; justify-content: center; align-items: center; }
         .ticket-modal-content { background: white; width: 85%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(140, 115, 109, 0.15); }
         .ticket-item-btn { width: 100%; padding: 15px; margin-bottom: 10px; background: #fcfcfc; border: 1px solid var(--success-color); border-radius: 12px; text-align: left; cursor: pointer; transition: 0.2s; color: var(--success-color); font-weight: bold;}
@@ -141,7 +139,8 @@
         .rules-content { font-size: 14px; line-height: 1.8; color: #555; }
         .rules-content h3 { color: var(--dark-accent); font-family: 'Playfair Display', serif; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-top: 25px; margin-bottom: 15px;}
         .rules-content h3:first-child { margin-top: 0; }
-        .rules-content ul { padding-left: 20px; margin-bottom: 20px;}
+        .rules-content p { margin: 8px 0; }
+        .rules-content ul { padding-left: 20px; margin-bottom: 20px; margin-top: 5px;}
         .rules-content li { margin-bottom: 8px; }
         .rules-content hr { border: none; border-top: 1px dashed #eee; margin: 20px 0; }
         .page-rules-wrapper { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
@@ -165,47 +164,72 @@
         <div class="initial-rules-content">
             <h2 style="font-family: 'Playfair Display', serif; color: var(--dark-accent); text-align: center; margin-top: 0;">課程制度說明</h2>
             <div class="initial-rules-scroll rules-content">
-                <h3>1｜費用計算與繳費</h3>
+                <h3>💰 課程費用說明</h3>
                 <ul>
-                    <li><strong>雙月預約期課：</strong> $750 / 堂。鼓勵穩定規律的練習，享有期課專屬優惠。系統會依該期實際排定之上課次數自動計算總費用。</li>
-                    <li><strong>單堂預約：</strong> $900 / 堂。適合時間較不固定的學員彈性安排。</li>
-                    <li>預約後請於指定時間內完成繳費，以確保為您保留名額。</li>
+                    <li><strong>雙月期課優惠（一期為 2 個月）：</strong>單堂優惠價 $750</li>
+                    <li><strong>單堂約課：</strong>單堂費用 $900</li>
                 </ul>
+                <p>💡 選擇期課不僅享有更優惠的價格，還會為您優先保留固定的練習時段喔！</p>
                 <hr>
-                <h3>2｜期課期間請假制度</h3>
+
+                <h3>📅 系統約課時程</h3>
+                <p>為讓大家能更順利安排時間，每月的系統約課與開課公告時程如下：</p>
                 <ul>
-                    <li>若因個人因素無法出席，可自行尋找親友代課使用。</li>
-                    <li>代課者需提前告知老師姓名與聯絡方式，以利課程安排。</li>
-                    <li>代課僅限同等級課程使用，不可更換其他課型。</li>
-                    <li>若未提前告知，老師有權不開放現場更換學員。</li>
-                </ul>
-                <hr>
-                <h3>3｜期課補課制度</h3>
-                <ul>
-                    <li>期課期間請假，可於「當期課程內」安排補課。</li>
-                    <li>補課需依老師可開放時段安排，不保證原固定時段。</li>
-                    <li>若當期結束前仍未完成補課，剩餘堂數將以該堂課費用 50% 辦理退費。</li>
-                    <li>為維護班級穩定與上課品質：
+                    <li><strong>《雙月期課》(一次上兩月)</strong>
                         <ul>
-                            <li>一期最多可請假 1 次</li>
-                            <li>包含事假、病假及個人因素請假。</li>
+                            <li>開放時間：開課前一個月的 15 號至月底。</li>
+                            <li>注意：雙數月月底一到即關閉報名，請務必把握時間。</li>
+                            <li>※ 範例：想上 7~8 月的期課，請在 6/15 ~ 6/30 之間完成報名。</li>
                         </ul>
                     </li>
-                    <li>超過請假次數之課程，將視同正常上課完成，不另提供補課或退費。</li>
+                    <li><strong>《單堂預約》(自由彈性預約)</strong>
+                        <ul>
+                            <li>開放時間：開課前一個月的 20 號 開始開放。</li>
+                            <li>注意：開放後會持續接受預約，直到下一次開放日（下一期的 20 號）再切換為新一期的課程。</li>
+                            <li>※ 範例：6/20 起，會全面開放 7~8 月的單堂預約；而 9~10 月的課程，則會在 8/20 開放。</li>
+                        </ul>
+                    </li>
                 </ul>
+                <p><strong>每月 25 號後：</strong>統一公告下月是否確認開課。</p>
                 <hr>
-                <h3>4｜單堂約課制度</h3>
+
+                <h3>📋 課程制度與規範</h3>
+                <p><strong>1️⃣ 雙月期課請假與補課制度</strong></p>
+                <p>為維護班級穩定與上課品質，雙月期課的請假規範如下：</p>
+                <ul>
+                    <li><strong>事假（含個人因素）：</strong>一期最多可請假 1 次(最慢為上課前12小時)。</li>
+                    <li><strong>病假：</strong>不包含在事假次數內。若因生病或身體不適請假，只需提供簡單證明（如看診收據、藥袋照片等），即可進入補課機制。</li>
+                </ul>
+                <p style="color: var(--danger-color); font-weight: bold;">⚠️ 若超過上述規範次數之缺席，將採退費機制（上課前12小時請假退費50%，上課前12小時內將不退費）。</p>
+
+                <p><strong>2️⃣ 每個時段有兩位學員即開班成功</strong></p>
+                <p><strong>🔄 補課與退費方式</strong></p>
+                <ul>
+                    <li>請假之課程，可於「當期課程內」安排補課。</li>
+                    <li>補課需依教室可開放之空位時段安排，無法保證為原固定時段。</li>
+                    <li>若當期結束前仍未完成補課，剩餘之補課堂數將以該堂課費用 50% 辦理退費。</li>
+                </ul>
+                <p><strong>🔄 期課親友代課制度</strong></p>
+                <ul>
+                    <li>若因個人因素無法出席且無法補課，可自行尋找親友代課使用。</li>
+                    <li>安排代課需提前告知老師代課者的「姓名與聯絡方式」，以利課程安排。</li>
+                    <li>代課僅限同等級課程使用，不可更換其他課型。</li>
+                </ul>
+                <p style="color: var(--danger-color); font-weight: bold;">⚠️ 若未提前告知，為保障教學品質，老師有權不開放現場更換學員。</p>
+
+                <p><strong>3️⃣ 單堂約課制度</strong></p>
                 <ul>
                     <li>可依個人時間彈性預約單堂課程。</li>
-                    <li>單堂課需提前預約與付款完成，才算保留名額。</li>
-                    <li>單堂課程不適用期課保留、補課與退費制度。</li>
-                    <li>若臨時取消，依教室請假規範辦理。</li>
+                    <li>單堂課需提前預約並「完成付款」，才算成功保留名額。</li>
+                    <li>單堂課程不適用期課之保留、補課與退費制度。</li>
+                    <li>若臨時取消，將依教室單堂請假規範辦理。</li>
                 </ul>
                 <hr>
-                <h3>補充說明</h3>
+
+                <h3>💡 補充說明</h3>
                 <ul>
-                    <li>為維持每位學員的固定位置與課程品質，期課制會優先保留固定時段學員。</li>
-                    <li>器械課程因名額有限，請大家協助遵守請假與補課規範，謝謝大家的理解與配合❤️</li>
+                    <li>為維持每位學員的練習習慣與課程品質，期課制會優先保留固定時段給原班學員。</li>
+                    <li>器械課程因名額有限，請大家協助遵守請假與補課規範。</li>
                 </ul>
             </div>
             <label class="agree-container" for="agree-initial-rules">
@@ -230,9 +254,10 @@
                 <div class="mode-switcher">
                     <button id="btn-single" class="mode-btn active" onclick="setMode('single')">單堂預約</button>
                     <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約</button>
-                    <button id="btn-makeup" class="mode-btn" onclick="openTicketModal()">使用補課額度</button>
+                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課額度</button>
                 </div>
-                <div id="bimonthly-hint" class="mode-hint">雙月限定：單數月的第一週 (限週一/二)</div>
+                <div id="single-hint" class="mode-hint" style="display:block;">開放時間：雙數月20號開放下兩期 (例: 6/20開放7-8月)</div>
+                <div id="bimonthly-hint" class="mode-hint">開放時間：雙數月15號至月底<br>雙月限定：單數月第一週 (限週一/二)</div>
                 <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
                     您有 <span id="credit-count" style="font-weight:bold;">0</span> 張補課券可使用<br>
                     <span id="makeup-period-hint" style="font-size:11px; color:#666;"></span>
@@ -283,47 +308,72 @@
             <button class="back-btn" onclick="goToPage('page-home')">← 返回首頁</button>
             <h2 class="card-title" style="margin-bottom: 25px;">課程制度說明</h2>
             <div class="page-rules-wrapper rules-content">
-                <h3>1｜費用計算與繳費</h3>
+                <h3>💰 課程費用說明</h3>
                 <ul>
-                    <li><strong>雙月預約期課：</strong> $750 / 堂。鼓勵穩定規律的練習，享有期課專屬優惠。系統會依該期實際排定之上課次數自動計算總費用。</li>
-                    <li><strong>單堂預約：</strong> $900 / 堂。適合時間較不固定的學員彈性安排。</li>
-                    <li>預約後請於指定時間內完成繳費，以確保為您保留名額。</li>
+                    <li><strong>雙月期課優惠（一期為 2 個月）：</strong>單堂優惠價 $750</li>
+                    <li><strong>單堂約課：</strong>單堂費用 $900</li>
                 </ul>
+                <p>💡 選擇期課不僅享有更優惠的價格，還會為您優先保留固定的練習時段喔！</p>
                 <hr>
-                <h3>2｜期課期間請假制度</h3>
+
+                <h3>📅 系統約課時程</h3>
+                <p>為讓大家能更順利安排時間，每月的系統約課與開課公告時程如下：</p>
                 <ul>
-                    <li>若因個人因素無法出席，可自行尋找親友代課使用。</li>
-                    <li>代課者需提前告知老師姓名與聯絡方式，以利課程安排。</li>
-                    <li>代課僅限同等級課程使用，不可更換其他課型。</li>
-                    <li>若未提前告知，老師有權不開放現場更換學員。</li>
-                </ul>
-                <hr>
-                <h3>3｜期課補課制度</h3>
-                <ul>
-                    <li>期課期間請假，可於「當期課程內」安排補課。</li>
-                    <li>補課需依老師可開放時段安排，不保證原固定時段。</li>
-                    <li>若當期結束前仍未完成補課，剩餘堂數將以該堂課費用 50% 辦理退費。</li>
-                    <li>為維護班級穩定與上課品質：
+                    <li><strong>《雙月期課》(一次上兩月)</strong>
                         <ul>
-                            <li>一期最多可請假 1 次</li>
-                            <li>包含事假、病假及個人因素請假。</li>
+                            <li>開放時間：開課前一個月的 15 號至月底。</li>
+                            <li>注意：雙數月月底一到即關閉報名，請務必把握時間。</li>
+                            <li>※ 範例：想上 7~8 月的期課，請在 6/15 ~ 6/30 之間完成報名。</li>
                         </ul>
                     </li>
-                    <li>超過請假次數之課程，將視同正常上課完成，不另提供補課或退費。</li>
+                    <li><strong>《單堂預約》(自由彈性預約)</strong>
+                        <ul>
+                            <li>開放時間：開課前一個月的 20 號 開始開放。</li>
+                            <li>注意：開放後會持續接受預約，直到下一次開放日（下一期的 20 號）再切換為新一期的課程。</li>
+                            <li>※ 範例：6/20 起，會全面開放 7~8 月的單堂預約；而 9~10 月的課程，則會在 8/20 開放。</li>
+                        </ul>
+                    </li>
                 </ul>
+                <p><strong>每月 25 號後：</strong>統一公告下月是否確認開課。</p>
                 <hr>
-                <h3>4｜單堂約課制度</h3>
+
+                <h3>📋 課程制度與規範</h3>
+                <p><strong>1️⃣ 雙月期課請假與補課制度</strong></p>
+                <p>為維護班級穩定與上課品質，雙月期課的請假規範如下：</p>
+                <ul>
+                    <li><strong>事假（含個人因素）：</strong>一期最多可請假 1 次(最慢為上課前12小時)。</li>
+                    <li><strong>病假：</strong>不包含在事假次數內。若因生病或身體不適請假，只需提供簡單證明（如看診收據、藥袋照片等），即可進入補課機制。</li>
+                </ul>
+                <p style="color: var(--danger-color); font-weight: bold;">⚠️ 若超過上述規範次數之缺席，將採退費機制（上課前12小時請假退費50%，上課前12小時內將不退費）。</p>
+
+                <p><strong>2️⃣ 每個時段有兩位學員即開班成功</strong></p>
+                <p><strong>🔄 補課與退費方式</strong></p>
+                <ul>
+                    <li>請假之課程，可於「當期課程內」安排補課。</li>
+                    <li>補課需依教室可開放之空位時段安排，無法保證為原固定時段。</li>
+                    <li>若當期結束前仍未完成補課，剩餘之補課堂數將以該堂課費用 50% 辦理退費。</li>
+                </ul>
+                <p><strong>🔄 期課親友代課制度</strong></p>
+                <ul>
+                    <li>若因個人因素無法出席且無法補課，可自行尋找親友代課使用。</li>
+                    <li>安排代課需提前告知老師代課者的「姓名與聯絡方式」，以利課程安排。</li>
+                    <li>代課僅限同等級課程使用，不可更換其他課型。</li>
+                </ul>
+                <p style="color: var(--danger-color); font-weight: bold;">⚠️ 若未提前告知，為保障教學品質，老師有權不開放現場更換學員。</p>
+
+                <p><strong>3️⃣ 單堂約課制度</strong></p>
                 <ul>
                     <li>可依個人時間彈性預約單堂課程。</li>
-                    <li>單堂課需提前預約與付款完成，才算保留名額。</li>
-                    <li>單堂課程不適用期課保留、補課與退費制度。</li>
-                    <li>若臨時取消，依教室請假規範辦理。</li>
+                    <li>單堂課需提前預約並「完成付款」，才算成功保留名額。</li>
+                    <li>單堂課程不適用期課之保留、補課與退費制度。</li>
+                    <li>若臨時取消，將依教室單堂請假規範辦理。</li>
                 </ul>
                 <hr>
-                <h3>補充說明</h3>
+
+                <h3>💡 補充說明</h3>
                 <ul>
-                    <li>為維持每位學員的固定位置與課程品質，期課制會優先保留固定時段學員。</li>
-                    <li>器械課程因名額有限，請大家協助遵守請假與補課規範，謝謝大家的理解與配合❤️</li>
+                    <li>為維持每位學員的練習習慣與課程品質，期課制會優先保留固定時段給原班學員。</li>
+                    <li>器械課程因名額有限，請大家協助遵守請假與補課規範。</li>
                 </ul>
             </div>
         </div>
@@ -455,13 +505,15 @@
     let selectedDayOfWeek = 0;     
     let selectedDatesArray = [];   
     let selectedTimeLabel = "";    
-    let cloudBookingData = {};     
+    let cloudBookingData = {}; 
+    let cloudHolidays = []; // ✨ 新增：動態存儲後台設定的休館日     
 
+    // 測試區塊保持原樣
     const realToday = new Date();
+    //const realToday = new Date('2026-06-20T10:00:00');
     let currentRenderYear = realToday.getFullYear();
     let currentRenderMonth = realToday.getMonth(); 
 
-    // 初始化與同步
     window.onload = () => {
         if (!sessionStorage.getItem('vivi_rules_agreed')) {
             document.getElementById('initial-rules-modal').style.display = 'flex';
@@ -510,16 +562,16 @@
         window.scrollTo(0, 0); 
     }
 
-    // 【雙向同步機制】：檢查老闆是否從後台刪除了某個課程
     async function fetchBookings() {
         showLoading("連線至伺服器...");
         try {
             const response = await fetch(API_URL + "?t=" + new Date().getTime());
             const resData = await response.json();
+            
             cloudBookingData = resData.counts;
+            cloudHolidays = resData.holidays || []; // ✨ 從雲端接下休館日
             const activeCloudIds = resData.activeIds || [];
 
-            // 同步本地資料
             let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
             let originalLen = myBookings.length;
             
@@ -558,7 +610,7 @@
 
     function checkMakeUpCredits() {
         let rawCredits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = realToday.toISOString().split('T')[0];
         let validCredits = rawCredits.filter(c => c.endDate >= todayStr);
         localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(validCredits));
         
@@ -614,6 +666,7 @@
         document.getElementById('btn-bimonthly').className = 'mode-btn';
         document.getElementById('btn-makeup').className = 'mode-btn active';
         
+        document.getElementById('single-hint').style.display = 'none';
         document.getElementById('bimonthly-hint').style.display = 'none';
         document.getElementById('makeup-hint').style.display = 'block';
         document.getElementById('makeup-period-hint').innerText = `(${ticket.monthLabel} 補課券，效期至 ${ticket.endDate})`;
@@ -634,6 +687,7 @@
         document.getElementById('btn-bimonthly').className = mode === 'bimonthly' ? 'mode-btn active' : 'mode-btn';
         document.getElementById('btn-makeup').className = 'mode-btn';
         
+        document.getElementById('single-hint').style.display = mode === 'single' ? 'block' : 'none';
         document.getElementById('bimonthly-hint').style.display = mode === 'bimonthly' ? 'block' : 'none';
         document.getElementById('makeup-hint').style.display = 'none';
         document.getElementById('app-container').classList.remove('mode-makeup-active');
@@ -686,23 +740,52 @@
             grid.appendChild(emptyCell);
         }
 
+        const todayZero = new Date(realToday.getFullYear(), realToday.getMonth(), realToday.getDate());
+
+        let cellMonthIdx = currentRenderMonth; 
+        let groupStartMonth = (cellMonthIdx % 2 === 0) ? cellMonthIdx : cellMonthIdx - 1;
+        let singleOpenDate = new Date(currentRenderYear, groupStartMonth - 1, 20);
+        let isSingleOpen = todayZero >= singleOpenDate;
+
+        let targetPeriodStartMonthIdx = groupStartMonth;
+        let bookingWindowMonthIdx = targetPeriodStartMonthIdx - 1;
+        let bookingWindowYear = currentRenderYear;
+        if (bookingWindowMonthIdx < 0) {
+            bookingWindowMonthIdx = 11;
+            bookingWindowYear--;
+        }
+        let bimonthlyWindowStart = new Date(bookingWindowYear, bookingWindowMonthIdx, 15);
+        let bimonthlyWindowEnd = new Date(bookingWindowYear, bookingWindowMonthIdx + 1, 0); 
+        let isBimonthlyOpen = todayZero >= bimonthlyWindowStart && todayZero <= bimonthlyWindowEnd;
+
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement('div');
             const dateKey = `${currentRenderYear}-${String(currentRenderMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             
-            const isPastDate = (currentRenderYear === realToday.getFullYear() && currentRenderMonth === realToday.getMonth() && day < realToday.getDate());
-            const dayOfWeek = new Date(currentRenderYear, currentRenderMonth, day).getDay();
+            let cellDate = new Date(currentRenderYear, currentRenderMonth, day);
+            const isPastDate = cellDate < todayZero;
+            const isHoliday = cloudHolidays.includes(dateKey); // ✨ 使用從雲端載入的休館日
+            const dayOfWeek = cellDate.getDay();
             const slotsForDay = SCHEDULE[dayOfWeek];
 
             const isFirstWeek = (day >= 1 && day <= 7);
             const isMonOrTue = (dayOfWeek === 1 || dayOfWeek === 2);
 
-            if (slotsForDay.length === 0) {
+            if (isHoliday) {
+                cell.className = 'day-cell past';
+                cell.innerHTML = `${day}<div class="status-text" style="color:var(--danger-color);">停課</div>`;
+            } else if (slotsForDay.length === 0) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text">休館</div>`;
             } else if (isPastDate) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}`;
+            } else if (currentMode === 'single' && !isSingleOpen) {
+                cell.className = 'day-cell past';
+                cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">未開放</div>`;
+            } else if (currentMode === 'bimonthly' && !isBimonthlyOpen) {
+                cell.className = 'day-cell past';
+                cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">未開放</div>`;
             } else if (currentMode === 'bimonthly' && (!isOddMonth || !isFirstWeek || !isMonOrTue)) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
@@ -740,9 +823,11 @@
             
             for (let d = 1; d <= daysInM; d++) {
                 let dDate = new Date(y, mm, d);
-                if (dDate.getDay() === dayOfWeek) {
+                let dKey = `${y}-${String(mm + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                // ✨ 動態忽略雲端休館日
+                if (dDate.getDay() === dayOfWeek && !cloudHolidays.includes(dKey)) {
                     if (m === 0 && d < startDay) continue; 
-                    dates.push(`${y}-${String(mm + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+                    dates.push(dKey);
                 }
             }
         }
@@ -768,9 +853,8 @@
         container.innerHTML = '';
         const slots = SCHEDULE[selectedDayOfWeek];
         
-        const today = new Date();
-        const isToday = (selectedDateStr === `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
-        const currentHour = today.getHours();
+        const isToday = (selectedDateStr === `${realToday.getFullYear()}-${String(realToday.getMonth() + 1).padStart(2, '0')}-${String(realToday.getDate()).padStart(2, '0')}`);
+        const currentHour = realToday.getHours();
 
         slots.forEach(slot => {
             const timeLabel = `${slot.start} - ${slot.end}`;
@@ -836,7 +920,6 @@
         document.getElementById('display-mode').style.color = currentMode === 'makeup' ? 'var(--success-color)' : 'var(--primary-color)';
         document.getElementById('display-time').innerText = timeLabel;
         
-        // 費用計算處理
         let totalFee = 0;
         let feeText = "";
         let isFree = false;
@@ -855,13 +938,12 @@
         document.getElementById('display-fee').innerText = feeText;
         document.getElementById('booking-form').dataset.fee = feeText; 
         
-        // 隱藏/顯示付款方式
         const paymentSection = document.getElementById('payment-section');
         const paymentRadios = document.querySelectorAll('input[name="payment"]');
         if (isFree) {
             paymentSection.style.display = 'none';
             paymentRadios.forEach(r => r.required = false);
-            togglePaymentInfo(); // 確保隱藏轉帳資訊
+            togglePaymentInfo(); 
         } else {
             paymentSection.style.display = 'block';
             paymentRadios.forEach(r => r.required = true);
@@ -903,7 +985,8 @@
             name: name,
             phone: phone,
             email: email, 
-            notes: combinedNotes
+            notes: combinedNotes,
+            parentUid: (currentMode === 'makeup' && activeMakeupCredit) ? activeMakeupCredit.parentUid : ""
         };
 
         try {
@@ -992,16 +1075,34 @@
                 
                 let detailsHtml = "";
                 if (isBimonthly && booking.datesArray) {
+                    let currentLeaveCount = booking.leaveCount || 0;
+
                     let datesListHtml = booking.datesArray.map(k => {
                         let shortDate = k.split('_')[0];
-                        let leaveActionHtml = (booking.leaveCount || 0) >= 1 
-                            ? `<span style="font-size:12px; color:#ccc;">已達上限</span>`
-                            : `<button class="leave-btn" onclick="requestLeave(${booking.timestamp}, '${booking.uid}', '${k}')">請假</button>`;
+                        let classTime = k.split('_')[1];
+                        
+                        let classDateObj = new Date(`${shortDate.replace(/-/g, '/')} ${classTime}:00`);
+                        let hoursDiff = (classDateObj.getTime() - realToday.getTime()) / (1000 * 60 * 60);
+                        
+                        let canLeave = true;
+                        let reason = "";
+
+                        if (hoursDiff < 12) {
+                            canLeave = false;
+                            reason = "逾時";
+                        } else if (currentLeaveCount >= 1) {
+                            canLeave = false;
+                            reason = "已達上限";
+                        }
+
+                        let actionHtml = canLeave 
+                            ? `<button class="leave-btn" onclick="requestLeave(${booking.timestamp}, '${booking.uid}', '${k}')">請假</button>`
+                            : `<span style="font-size:12px; color:#999; margin-right:5px;">不可請假(${reason})</span>`;
 
                         return `
                         <div class="detail-row">
-                            <span>${shortDate}</span>
-                            ${leaveActionHtml}
+                            <span>${shortDate} ${classTime}</span>
+                            ${actionHtml}
                         </div>`;
                     }).join('');
 
@@ -1036,14 +1137,6 @@
     }
 
     async function requestLeave(timestamp, uid, dateKeyToLeave) {
-        let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
-        let targetBooking = myBookings.find(b => b.timestamp === timestamp);
-        
-        if (targetBooking && (targetBooking.leaveCount || 0) >= 1) {
-            alert("您已達到本期「雙月預約」的請假上限（最多 1 次）！");
-            return;
-        }
-
         if(confirm(`確定要針對 ${dateKeyToLeave.split('_')[0]} 請假嗎？\n\n系統將釋出該日名額，並發放一張「補課券」給您（限本期內使用）。`)) {
             showLoading("處理請假中...");
             try {
@@ -1052,16 +1145,16 @@
                     body: JSON.stringify({ action: 'leave', id: uid, leaveDate: dateKeyToLeave })
                 });
 
-                myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
-                targetBooking = myBookings.find(b => b.timestamp === timestamp);
-
+                let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+                let targetBooking = myBookings.find(b => b.timestamp === timestamp);
+                
                 if (targetBooking) {
-                    targetBooking.datesArray = targetBooking.datesArray.filter(d => d !== dateKeyToLeave);
                     targetBooking.leaveCount = (targetBooking.leaveCount || 0) + 1; 
+                    targetBooking.datesArray = targetBooking.datesArray.filter(d => d !== dateKeyToLeave);
                     
-                    let startDateStr = targetBooking.datesArray.length > 0 ? targetBooking.datesArray[0].split('_')[0] : new Date().toISOString().split('T')[0];
+                    let leaveDateOnly = dateKeyToLeave.split('_')[0]; 
                     let originalStartTime = dateKeyToLeave.split('_')[1]; 
-                    let leaveDateObj = new Date(dateKeyToLeave.split('_')[0]);
+                    let leaveDateObj = new Date(leaveDateOnly.replace(/-/g, '/'));
                     let originalDayOfWeek = leaveDateObj.getDay(); 
                     
                     let y = leaveDateObj.getFullYear();
@@ -1105,22 +1198,46 @@
 
         let msg = "確定要取消這筆預約嗎？\n\n這將會同步釋出雲端試算表上的名額供其他人預約！";
         if (mode === 'bimonthly') {
-            msg = "確定要取消整期「雙月預約」嗎？\n\n注意：這會連同您已獲得的補課券一併註銷！";
+            // ✨ 提示文字更新，告知會一併取消補課
+            msg = "確定要取消整期「雙月預約」嗎？\n\n注意：這會連同您已獲得的補課券，以及「已使用該券預約的補課」一併註銷取消，釋出名額！";
         }
 
         if(confirm(msg)) {
             showLoading("正在取消預約...");
             try {
+                let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
+                let targetBooking = myBookings.find(b => b.timestamp === timestamp);
+
+                // ✨ 新增核心邏輯：如果是取消雙月期課，先找出衍生出來的「補課紀錄」，把它們從雲端刪除退還名額
+                if (mode === 'bimonthly') {
+                    let childBookings = myBookings.filter(b => b.mode === 'makeup' && b.parentCredit && b.parentCredit.parentUid === uid);
+                    
+                    // 針對每一筆用此期課補課券約的課，傳送刪除指令給後台
+                    for (let child of childBookings) {
+                        await fetch(API_URL, {
+                            method: 'POST',
+                            body: JSON.stringify({ action: 'delete', id: child.uid })
+                        });
+                    }
+                }
+
+                // 接著刪除原本點擊要取消的這筆主預約
                 await fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'delete', id: uid })
                 });
 
-                let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
-                let targetBooking = myBookings.find(b => b.timestamp === timestamp);
+                // 整理本地端 localStorage 的資料 (移除主預約)
                 myBookings = myBookings.filter(b => b.timestamp !== timestamp);
+                
+                // 如果是雙月期課，同時從本地端畫面把「子補課紀錄」清乾淨
+                if (mode === 'bimonthly') {
+                    myBookings = myBookings.filter(b => !(b.mode === 'makeup' && b.parentCredit && b.parentCredit.parentUid === uid));
+                }
+                
                 localStorage.setItem('vivi_my_bookings', JSON.stringify(myBookings));
                 
+                // 處理單純取消「補課」時，退還補課券
                 if (mode === 'makeup' && targetBooking && targetBooking.parentCredit) {
                     let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
                     credits.push(targetBooking.parentCredit);
@@ -1128,6 +1245,7 @@
                     alert("補課取消成功！已退還 1 張補課券。");
                 }
 
+                // 處理取消「雙月期課」時，把還沒用的補課券註銷
                 if (mode === 'bimonthly') {
                     let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
                     let filteredCredits = credits.filter(c => c.parentUid !== uid); 
@@ -1135,7 +1253,7 @@
                 }
 
                 showMyBookings(); 
-                fetchBookings();  
+                fetchBookings();  // 重新抓取資料，剛剛釋出的名額就會瞬間空出來供其他人預約！
             } catch (error) {
                 alert("取消失敗，請確認網路連線。");
             } finally {
