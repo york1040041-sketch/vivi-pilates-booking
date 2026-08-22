@@ -252,12 +252,14 @@
             <div class="card">
                 <h2 class="card-title">Book a Session</h2>
                 <div class="mode-switcher">
+                    <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約(一堂)</button>
+                    <button id="btn-bimonthly-multi" class="mode-btn" onclick="setMode('bimonthly-multi')">雙月預約(多堂)</button>
                     <button id="btn-single" class="mode-btn active" onclick="setMode('single')">單堂預約</button>
-                    <button id="btn-bimonthly" class="mode-btn" onclick="setMode('bimonthly')">雙月預約</button>
-                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課額度</button>
+                    <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課</button>
                 </div>
                 <div id="single-hint" class="mode-hint" style="display:block;">開放時間：雙數月20號開放下兩期 (例: 6/20開放7-8月)</div>
                 <div id="bimonthly-hint" class="mode-hint">開放時間：雙數月15號至月底<br>雙月限定：單數月第一週 (限週一/二)</div>
+                <div id="bimonthly-multi-hint" class="mode-hint">開放時間：雙數月15號至月底<br>⚠️ 須選擇兩堂以上，享單堂 $680 優惠 (請分次預約您的時段)</div>
                 <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
                     您有 <span id="credit-count" style="font-weight:bold;">0</span> 張補課券可使用<br>
                     <span id="makeup-period-hint" style="font-size:11px; color:#666;"></span>
@@ -391,8 +393,18 @@
         <div class="sub-page-container">
             <button class="back-btn" onclick="goToPage('page-home')">← 返回日曆</button>
             <h2 class="card-title">Select Time</h2>
-            <p class="card-subtitle" id="time-display-date" style="margin-bottom: 25px;"></p>
+            <p class="card-subtitle" id="time-display-date" style="margin-bottom: 15px;"></p>
+            
+            <!-- 新增：多堂模式的星期切換 -->
+            <div id="multi-day-switcher" class="mode-switcher" style="display:none; margin-bottom: 20px;">
+                <button id="btn-day-1" class="mode-btn" onclick="switchMultiDay(1)">星期一</button>
+                <button id="btn-day-2" class="mode-btn" onclick="switchMultiDay(2)">星期二</button>
+            </div>
+            
             <div id="time-slots-container"></div>
+            
+            <!-- 新增：多堂模式的確認結算按鈕 -->
+            <button id="btn-confirm-multi-time" class="submit-btn" style="display:none; margin-top:20px;" onclick="confirmMultiTime()">確認時段 (已選 0 堂)</button>
         </div>
     </div>
 
@@ -505,12 +517,15 @@
     let selectedDayOfWeek = 0;     
     let selectedDatesArray = [];   
     let selectedTimeLabel = "";    
-    let cloudBookingData = {}; 
+    let cloudBookingData = {};
+    // 新增：多堂預約所需的狀態變數
+    let multiSelections = {}; 
+    let baseYear, baseMonth; 
     let cloudHolidays = []; // ✨ 新增：動態存儲後台設定的休館日     
 
     // 測試區塊保持原樣
     const realToday = new Date();
-    //const realToday = new Date('2026-07-14T12:00:00');
+    //const realToday = new Date('2026-10-22T12:00:00');
     let currentRenderYear = realToday.getFullYear();
     let currentRenderMonth = realToday.getMonth(); 
 
@@ -685,10 +700,12 @@
         currentMode = mode;
         document.getElementById('btn-single').className = mode === 'single' ? 'mode-btn active' : 'mode-btn';
         document.getElementById('btn-bimonthly').className = mode === 'bimonthly' ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-bimonthly-multi').className = mode === 'bimonthly-multi' ? 'mode-btn active' : 'mode-btn';
         document.getElementById('btn-makeup').className = 'mode-btn';
         
         document.getElementById('single-hint').style.display = mode === 'single' ? 'block' : 'none';
         document.getElementById('bimonthly-hint').style.display = mode === 'bimonthly' ? 'block' : 'none';
+        document.getElementById('bimonthly-multi-hint').style.display = mode === 'bimonthly-multi' ? 'block' : 'none';
         document.getElementById('makeup-hint').style.display = 'none';
         document.getElementById('app-container').classList.remove('mode-makeup-active');
         renderCalendar(); 
@@ -783,10 +800,10 @@
             } else if (currentMode === 'single' && !isSingleOpen) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">未開放</div>`;
-            } else if (currentMode === 'bimonthly' && !isBimonthlyOpen) {
+            } else if ((currentMode === 'bimonthly' || currentMode === 'bimonthly-multi') && !isBimonthlyOpen) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">未開放</div>`;
-            } else if (currentMode === 'bimonthly' && (!isOddMonth || !isFirstWeek || !isMonOrTue)) {
+            } else if ((currentMode === 'bimonthly' || currentMode === 'bimonthly-multi') && (!isOddMonth || !isFirstWeek || !isMonOrTue)) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
             } else if (currentMode === 'makeup' && activeMakeupCredit) {
@@ -838,16 +855,29 @@
         selectedDateStr = dateKey;
         selectedDayOfWeek = dayOfWeek;
         selectedDatesArray = getDatesForMode(year, monthIdx, day, dayOfWeek);
+        baseYear = year;
+        baseMonth = monthIdx;
 
         let displayModeText = '【單堂預約】';
-        if (currentMode === 'bimonthly') displayModeText = '【雙月預約】';
+        if (currentMode === 'bimonthly') displayModeText = '【雙月預約(一堂)】';
+        if (currentMode === 'bimonthly-multi') displayModeText = '【雙月預約(多堂)】';
         if (currentMode === 'makeup') displayModeText = '【單堂補課】';
         
-        document.getElementById('time-display-date').innerText = `${displayModeText}\n日期：${year}年 ${monthIdx + 1}月 ${day}日`;
-        renderTimeSlots();
+        if (currentMode === 'bimonthly-multi') {
+            document.getElementById('time-display-date').innerText = `${displayModeText}\n月份：${year}年 ${monthIdx + 1}月 起`;
+            document.getElementById('multi-day-switcher').style.display = 'flex';
+            document.getElementById('btn-confirm-multi-time').style.display = 'block';
+            multiSelections = {}; // 清空先前的選擇
+            switchMultiDay(dayOfWeek); // 自動切換至點擊的星期
+        } else {
+            document.getElementById('time-display-date').innerText = `${displayModeText}\n日期：${year}年 ${monthIdx + 1}月 ${day}日`;
+            document.getElementById('multi-day-switcher').style.display = 'none';
+            document.getElementById('btn-confirm-multi-time').style.display = 'none';
+            renderTimeSlots();
+        }
         goToPage('page-time');
     }
-
+    
     function renderTimeSlots() {
         const container = document.getElementById('time-slots-container');
         container.innerHTML = '';
@@ -891,14 +921,103 @@
                 btn.innerText = `${timeLabel} (已額滿)`;
             } else {
                 btn.innerText = `${timeLabel} (剩 ${remaining} 位)`;
-                if(currentMode === 'makeup') {
-                    btn.style.color = 'var(--success-color)';
-                    btn.style.borderColor = 'var(--success-color)';
+                if (currentMode === 'bimonthly-multi') {
+                    // 組合專屬鑰匙，讓同一天可選多堂
+                    let multiKey = `${selectedDayOfWeek}_${slot.start}`;
+                    if (multiSelections[multiKey]) {
+                        btn.style.backgroundColor = 'var(--primary-color)';
+                        btn.style.color = 'white';
+                    }
+                    btn.onclick = () => toggleMultiSlot(slot.start, timeLabel);
+                } else {
+                    if(currentMode === 'makeup') {
+                        btn.style.color = 'var(--success-color)';
+                        btn.style.borderColor = 'var(--success-color)';
+                    }
+                    btn.onclick = () => selectTime(slot.start, timeLabel);
                 }
-                btn.onclick = () => selectTime(slot.start, timeLabel);
             }
             container.appendChild(btn);
         });
+    }
+
+    // ✅ 新增：切換星期功能
+    function switchMultiDay(dayOfWeek) {
+        document.getElementById('btn-day-1').className = (dayOfWeek === 1) ? 'mode-btn active' : 'mode-btn';
+        document.getElementById('btn-day-2').className = (dayOfWeek === 2) ? 'mode-btn active' : 'mode-btn';
+        
+        // 尋找當月第一週的對應星期幾作為基準日
+        let firstDayDate = 1;
+        for (let d = 1; d <= 7; d++) {
+            let tempDate = new Date(baseYear, baseMonth, d);
+            if (tempDate.getDay() === dayOfWeek) {
+                firstDayDate = d;
+                break;
+            }
+        }
+        
+        selectedDayOfWeek = dayOfWeek;
+        selectedDatesArray = getDatesForMode(baseYear, baseMonth, firstDayDate, dayOfWeek);
+        renderTimeSlots();
+    }
+
+    // ✅ 新增：點擊時段反白與紀錄
+    function toggleMultiSlot(startTime, timeLabel) {
+        let multiKey = `${selectedDayOfWeek}_${startTime}`;
+        if (multiSelections[multiKey]) {
+            delete multiSelections[multiKey]; // 再次點擊即取消
+        } else {
+            multiSelections[multiKey] = {
+                dayOfWeek: selectedDayOfWeek, // 記錄這是星期幾的課
+                startTime: startTime,
+                timeLabel: timeLabel,
+                datesArray: [...selectedDatesArray]
+            };
+        }
+        
+        let count = Object.keys(multiSelections).length;
+        document.getElementById('btn-confirm-multi-time').innerText = `確認時段 (已選 ${count} 堂)`;
+        renderTimeSlots(); // 重新渲染以刷新按鈕顏色
+    }
+
+    // ✅ 新增：確認最終多堂選擇，並拋轉至結帳表單
+    function confirmMultiTime() {
+        let keys = Object.keys(multiSelections);
+        if (keys.length < 2) {
+            alert('雙月預約(多堂) 必須選擇至少兩堂不同的時段喔！');
+            return;
+        }
+        
+        let combinedDateKeys = [];
+        let combinedTimeLabels = [];
+        
+        keys.forEach(multiKey => {
+            let sel = multiSelections[multiKey];
+            let keysForDay = sel.datesArray.map(d => `${d}_${sel.startTime}`);
+            combinedDateKeys = combinedDateKeys.concat(keysForDay);
+            combinedTimeLabels.push(`週${['日','一','二','三','四','五','六'][sel.dayOfWeek]} ${sel.timeLabel}`);
+        });
+        
+        combinedDateKeys.sort(); 
+        selectedTimeLabel = combinedTimeLabels.join(' / '); // 寫入全域變數供後續使用
+        
+        document.getElementById('display-mode').innerText = '方案：雙月預約(多堂)';
+        document.getElementById('display-date').innerHTML = `包含日期：<br>` + combinedDateKeys.map(k => k.split('_')[0]).join(', ');
+        document.getElementById('display-mode').style.color = 'var(--primary-color)';
+        document.getElementById('display-time').innerText = selectedTimeLabel;
+        
+        let totalFee = combinedDateKeys.length * 680;
+        let feeText = `NT$ ${totalFee} (${combinedDateKeys.length}堂 x $680) [多堂優惠]`;
+        
+        document.getElementById('display-fee').innerText = feeText;
+        document.getElementById('booking-form').dataset.fee = feeText;
+        
+        document.getElementById('payment-section').style.display = 'block';
+        document.querySelectorAll('input[name="payment"]').forEach(r => r.required = true);
+
+        document.getElementById('booking-form').dataset.keys = JSON.stringify(combinedDateKeys);
+        document.getElementById('booking-form').reset();
+        goToPage('page-form');
     }
 
     function selectTime(startTime, timeLabel) {
@@ -1065,14 +1184,16 @@
             container.innerHTML = '<div class="empty-bookings">您目前尚無預約紀錄</div>';
         } else {
             myBookings.forEach(booking => {
-                const isBimonthly = booking.mode === 'bimonthly';
+                // 讓系統知道「多堂」也是期課的一種，這樣就會自動顯示詳細日期與請假按鈕
+                const isBimonthly = (booking.mode === 'bimonthly' || booking.mode === 'bimonthly-multi');
                 const isMakeup = booking.mode === 'makeup';
                 const isSingle = booking.mode === 'single';
                 
                 let tagClass = 'tag-single';
                 let tagText = '單堂';
-                if (isBimonthly) { tagClass = 'tag-bimonthly'; tagText = '雙月預約'; }
-                if (isMakeup) { tagClass = 'tag-makeup'; tagText = '補課'; }
+                if (booking.mode === 'bimonthly') { tagClass = 'tag-bimonthly'; tagText = '雙月預約(一堂)'; }
+                if (booking.mode === 'bimonthly-multi') { tagClass = 'tag-bimonthly'; tagText = '雙月預約(多堂)'; }
+                if (booking.mode === 'makeup') { tagClass = 'tag-makeup'; tagText = '補課'; }
                 
                 let detailsHtml = "";
                 if (isBimonthly && booking.datesArray) {
@@ -1223,7 +1344,7 @@
         if (!uid) { alert("此為舊紀錄，無法線上取消，請聯絡老師！"); return; }
 
         let msg = "確定要取消這筆預約嗎？\n\n這將會同步釋出雲端試算表上的名額供其他人預約！";
-        if (mode === 'bimonthly') {
+        if (mode === 'bimonthly' || mode === 'bimonthly-multi') {
             // ✨ 提示文字更新，告知會一併取消補課
             msg = "確定要取消整期「雙月預約」嗎？\n\n注意：這會連同您已獲得的補課券，以及「已使用該券預約的補課」一併註銷取消，釋出名額！";
         }
@@ -1235,7 +1356,7 @@
                 let targetBooking = myBookings.find(b => b.timestamp === timestamp);
 
                 // ✨ 新增核心邏輯：如果是取消雙月期課，先找出衍生出來的「補課紀錄」，把它們從雲端刪除退還名額
-                if (mode === 'bimonthly') {
+                if (mode === 'bimonthly' || mode === 'bimonthly-multi') {
                     let childBookings = myBookings.filter(b => b.mode === 'makeup' && b.parentCredit && b.parentCredit.parentUid === uid);
                     
                     // 針對每一筆用此期課補課券約的課，傳送刪除指令給後台
@@ -1257,7 +1378,7 @@
                 myBookings = myBookings.filter(b => b.timestamp !== timestamp);
                 
                 // 如果是雙月期課，同時從本地端畫面把「子補課紀錄」清乾淨
-                if (mode === 'bimonthly') {
+                if (mode === 'bimonthly' || mode === 'bimonthly-multi') {
                     myBookings = myBookings.filter(b => !(b.mode === 'makeup' && b.parentCredit && b.parentCredit.parentUid === uid));
                 }
                 
@@ -1272,14 +1393,14 @@
                 }
 
                 // 處理取消「雙月期課」時，把還沒用的補課券註銷
-                if (mode === 'bimonthly') {
+                if (mode === 'bimonthly' || mode === 'bimonthly-multi') {
                     let credits = JSON.parse(localStorage.getItem('vivi_makeup_credits_obj')) || [];
                     let filteredCredits = credits.filter(c => c.parentUid !== uid); 
                     localStorage.setItem('vivi_makeup_credits_obj', JSON.stringify(filteredCredits));
                 }
 
                 showMyBookings(); 
-                fetchBookings();  // 重新抓取資料，剛剛釋出的名額就會瞬間空出來供其他人預約！
+                fetchBookings();  
             } catch (error) {
                 alert("取消失敗，請確認網路連線。");
             } finally {
