@@ -146,6 +146,14 @@
         .page-rules-wrapper { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         
         .important-info-box { background-color: #fffaf0; border-left: 4px solid #f39c12; padding: 12px 15px; border-radius: 4px; margin-bottom: 25px; font-size: 13px; color: #666; line-height: 1.6; text-align: left; }
+    
+        /* 師資介紹專用樣式 */
+        .teacher-card { background: #fbfbfb; border: 1px solid #eee; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .teacher-card:last-child { margin-bottom: 0; }
+        .teacher-name { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: bold; color: var(--dark-accent); margin: 0 0 15px 0; border-bottom: 2px solid #E8DCD6; padding-bottom: 10px; }
+        .teacher-section-title { font-weight: bold; color: var(--text-color); margin-top: 15px; margin-bottom: 8px; font-size: 15px; }
+        .teacher-card ul, .teacher-card ol { margin-top: 0; padding-left: 22px; color: #666; font-size: 14px; line-height: 1.8; margin-bottom: 15px; }
+        .teacher-card li { margin-bottom: 4px; }
     </style>
 </head>
 <body>
@@ -166,7 +174,8 @@
             <div class="initial-rules-scroll rules-content">
                 <h3>💰 課程費用說明</h3>
                 <ul>
-                    <li><strong>雙月期課優惠（一期為 2 個月）：</strong>單堂優惠價 $750</li>
+                    <li><strong>雙月預約(一堂)（一期為 2 個月）：</strong>單堂優惠價 $750</li>
+                    <li><strong>雙月預約(多堂)（一期為 2 個月）：</strong>單堂優惠價 $680</li>
                     <li><strong>單堂約課：</strong>單堂費用 $900</li>
                 </ul>
                 <p>💡 選擇期課不僅享有更優惠的價格，還會為您優先保留固定的練習時段喔！</p>
@@ -175,7 +184,7 @@
                 <h3>📅 系統約課時程</h3>
                 <p>為讓大家能更順利安排時間，每月的系統約課與開課公告時程如下：</p>
                 <ul>
-                    <li><strong>《雙月期課》(一次上兩月)</strong>
+                    <li><strong>《雙月預約》(一堂) / (多堂)(一次上兩個月)</strong>
                         <ul>
                             <li>開放時間：開課前一個月的 15 號至月底。</li>
                             <li>注意：雙數月月底一到即關閉報名，請務必把握時間。</li>
@@ -194,10 +203,15 @@
                 <hr>
 
                 <h3>📋 課程制度與規範</h3>
-                <p><strong>1️⃣ 雙月期課請假與補課制度</strong></p>
+                <p><strong>1️⃣ 雙月預約請假與補課制度</strong></p>
                 <p>為維護班級穩定與上課品質，雙月期課的請假規範如下：</p>
                 <ul>
-                    <li><strong>事假（含個人因素）：</strong>一期最多可請假 1 次(最慢為上課前12小時)。</li>
+                    <li><strong>事假（含個人因素）：</strong>
+                        <ul>
+                            <li>(一堂)：一期最多可請假 1 次 (最慢為上課前12小時)。</li>
+                            <li>(多堂)：一期最多可請假 2 次 (最慢為上課前12小時)。</li>
+                        </ul>
+                    </li>
                     <li><strong>病假：</strong>不包含在事假次數內。若因生病或身體不適請假，只需提供簡單證明（如看診收據、藥袋照片等），即可進入補課機制。</li>
                 </ul>
                 <p style="color: var(--danger-color); font-weight: bold;">⚠️ 若超過上述規範次數之缺席，將採退費機制（上課前12小時請假退費50%，上課前12小時內將不退費）。</p>
@@ -258,7 +272,7 @@
                     <button id="btn-makeup" class="mode-btn" onclick="setMode('makeup')">使用補課</button>
                 </div>
                 <div id="single-hint" class="mode-hint" style="display:block;">開放時間：雙數月20號開放下兩期 (例: 6/20開放7-8月)</div>
-                <div id="bimonthly-hint" class="mode-hint">開放時間：雙數月15號至月底<br>雙月限定：單數月第一週 (限週一/二)</div>
+                <div id="bimonthly-hint" class="mode-hint">開放時間：雙數月15號至月底<br>雙月限定：單數月第一週 (限週一/二/四/五)</div>
                 <div id="bimonthly-multi-hint" class="mode-hint">開放時間：雙數月15號至月底<br>⚠️ 須選擇兩堂以上，享單堂 $680 優惠 (請分次預約您的時段)</div>
                 <div id="makeup-hint" class="mode-hint" style="color:var(--success-color); background:#f0f7f3; display:none;">
                     您有 <span id="credit-count" style="font-weight:bold;">0</span> 張補課券可使用<br>
@@ -272,6 +286,10 @@
                 <button class="rules-btn" onclick="goToPage('page-rules')">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
                     課程制度說明
+                </button>
+                <button class="rules-btn" onclick="goToPage('page-teachers')" style="margin-top: 10px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    師資介紹
                 </button>
             </div>
 
@@ -312,7 +330,8 @@
             <div class="page-rules-wrapper rules-content">
                 <h3>💰 課程費用說明</h3>
                 <ul>
-                    <li><strong>雙月期課優惠（一期為 2 個月）：</strong>單堂優惠價 $750</li>
+                    <li><strong>雙月預約(一堂)（一期為 2 個月）：</strong>單堂優惠價 $750</li>
+                    <li><strong>雙月預約(多堂)（一期為 2 個月）：</strong>單堂優惠價 $680</li>
                     <li><strong>單堂約課：</strong>單堂費用 $900</li>
                 </ul>
                 <p>💡 選擇期課不僅享有更優惠的價格，還會為您優先保留固定的練習時段喔！</p>
@@ -321,7 +340,7 @@
                 <h3>📅 系統約課時程</h3>
                 <p>為讓大家能更順利安排時間，每月的系統約課與開課公告時程如下：</p>
                 <ul>
-                    <li><strong>《雙月期課》(一次上兩月)</strong>
+                    <li><strong>《雙月預約》(一堂) / (多堂)(一次上兩個月)</strong>
                         <ul>
                             <li>開放時間：開課前一個月的 15 號至月底。</li>
                             <li>注意：雙數月月底一到即關閉報名，請務必把握時間。</li>
@@ -343,7 +362,12 @@
                 <p><strong>1️⃣ 雙月期課請假與補課制度</strong></p>
                 <p>為維護班級穩定與上課品質，雙月期課的請假規範如下：</p>
                 <ul>
-                    <li><strong>事假（含個人因素）：</strong>一期最多可請假 1 次(最慢為上課前12小時)。</li>
+                    <li><strong>事假（含個人因素）：</strong>
+                        <ul>
+                            <li>(一堂)：一期最多可請假 1 次 (最慢為上課前12小時)。</li>
+                            <li>(多堂)：一期最多可請假 2 次 (最慢為上課前12小時)。</li>
+                        </ul>
+                    </li>
                     <li><strong>病假：</strong>不包含在事假次數內。若因生病或身體不適請假，只需提供簡單證明（如看診收據、藥袋照片等），即可進入補課機制。</li>
                 </ul>
                 <p style="color: var(--danger-color); font-weight: bold;">⚠️ 若超過上述規範次數之缺席，將採退費機制（上課前12小時請假退費50%，上課前12小時內將不退費）。</p>
@@ -381,6 +405,82 @@
         </div>
     </div>
 
+    <div id="page-teachers" class="page">
+        <div class="sub-page-container">
+            <button class="back-btn" onclick="goToPage('page-home')">← 返回首頁</button>
+            <h2 class="card-title" style="margin-bottom: 25px;">師資介紹</h2>
+            
+            <div class="page-rules-wrapper">
+                <!-- Vivian 老師 -->
+                <div class="teacher-card">
+                    <h3 class="teacher-name">Vivian 老師</h3>
+                    
+                    <div class="teacher-section-title">【個人經歷】</div>
+                    <ul>
+                        <li>2022–2026｜芭蕾、幼兒律動舞蹈老師</li>
+                        <li>2024–2026｜瑜伽、體適能老師</li>
+                        <li>2024–2026｜皮拉提斯教練</li>
+                    </ul>
+
+                    <div class="teacher-section-title">【訓練專長】</div>
+                    <ol>
+                        <li>體態改善與姿勢評估調整</li>
+                        <li>皮拉提斯全器械與墊上核心訓練</li>
+                        <li>深層核心控制與肌力整合</li>
+                        <li>產後修復與女性體態雕塑</li>
+                        <li>關節活動度提升與動作優化</li>
+                        <li>身體覺察與肌力柔韌性整合</li>
+                        <li>肢體伸展柔軟度開發</li>
+                        <li>芭蕾線條雕塑</li>
+                    </ol>
+
+                    <div class="teacher-section-title">【相關證照與研習】</div>
+                    <ul>
+                        <li>Balanced Body® Reformer</li>
+                        <li>Balanced Body® Cadillac／Chair／Barrel／Arc</li>
+                        <li>Balanced Body® MP 動作原則</li>
+                        <li>AFAA MAT墊上核心指導員</li>
+                        <li>母托邦—Pilates 產後修復工坊</li>
+                        <li>母托邦—Pilates 亞健康人群</li>
+                        <li>triangelyogatw 一級瑜珈輪導師</li>
+                        <li>基本救命術訓練課程 (BLS+BTLS & CPR+AED)</li>
+                    </ul>
+                </div>
+
+                <!-- 圈圈 老師 -->
+                <div class="teacher-card">
+                    <h3 class="teacher-name">圈圈 老師</h3>
+                    
+                    <div class="teacher-section-title">【個人經歷】</div>
+                    <ul>
+                        <li>三角瑜伽</li>
+                        <li>目門多功能運動空間</li>
+                        <li>一米瑜伽工作室</li>
+                        <li>慢森活工作室</li>
+                        <li>HH跳跳館</li>
+                        <li>台南永華國民運動中心</li>
+                    </ul>
+
+                    <div class="teacher-section-title">【訓練專長】</div>
+                    <ul>
+                        <li>身體覺察與動作控制</li>
+                        <li>身體姿勢與排列調整</li>
+                        <li>柔軟度與肌力提升</li>
+                        <li>核心肌群訓練</li>
+                    </ul>
+
+                    <div class="teacher-section-title">【相關證照研習】</div>
+                    <ul>
+                        <li>Pilates code Level 1-3</li>
+                        <li>Yoga alliance 100 hours</li>
+                        <li>LE YOGA aerial yoga</li>
+                        <li>功能性解剖學認證</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="page-my-bookings" class="page">
         <div class="sub-page-container">
             <button class="back-btn" onclick="goToPage('page-home')">← 返回首頁</button>
@@ -397,8 +497,10 @@
             
             <!-- 新增：多堂模式的星期切換 -->
             <div id="multi-day-switcher" class="mode-switcher" style="display:none; margin-bottom: 20px;">
-                <button id="btn-day-1" class="mode-btn" onclick="switchMultiDay(1)">星期一</button>
-                <button id="btn-day-2" class="mode-btn" onclick="switchMultiDay(2)">星期二</button>
+                <button id="btn-day-1" class="mode-btn" onclick="switchMultiDay(1)">週一 (Vivian)</button>
+                <button id="btn-day-2" class="mode-btn" onclick="switchMultiDay(2)">週二 (Vivian)</button>
+                <button id="btn-day-4" class="mode-btn" onclick="switchMultiDay(4)">週四 (圈圈)</button>
+                <button id="btn-day-5" class="mode-btn" onclick="switchMultiDay(5)">週五 (圈圈)</button>
             </div>
             
             <div id="time-slots-container"></div>
@@ -506,9 +608,24 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbwNW4YYWpuJezwaINSOB0agY4V6dbtNp4e01J5MNdZo6cWwthk1ieV8m2ja867C5v-hrQ/exec";
     const MAX_PEOPLE = 4;
     const SCHEDULE = {
-        1: [{start: "18:30", end: "19:25"}, {start: "19:35", end: "20:30"}, {start: "20:45", end: "21:40"}], 
-        2: [{start: "19:50", end: "20:45"}, {start: "21:00", end: "21:55"}],
-        3: [], 4: [], 5: [], 6: [], 0: [] 
+        1: [
+            {teacher: "Vivian老師", start: "18:30", end: "19:25"},
+            {teacher: "Vivian老師", start: "19:35", end: "20:30"},
+            {teacher: "Vivian老師", start: "20:45", end: "21:40"}
+        ], 
+        2: [
+            {teacher: "Vivian老師", start: "19:50", end: "20:45"},
+            {teacher: "Vivian老師", start: "21:00", end: "21:55"}
+        ],
+        3: [], 
+        4: [
+            {teacher: "圈圈老師", start: "21:00", end: "21:55"}
+        ], 
+        5: [
+            {teacher: "圈圈老師", start: "18:10", end: "19:05"},
+            {teacher: "圈圈老師", start: "19:15", end: "20:10"}
+        ], 
+        6: [], 0: [] 
     };
 
     let currentMode = 'single'; 
@@ -524,8 +641,8 @@
     let cloudHolidays = []; // ✨ 新增：動態存儲後台設定的休館日     
 
     // 測試區塊保持原樣
-    const realToday = new Date();
-    //const realToday = new Date('2026-10-22T12:00:00');
+    //const realToday = new Date();
+    const realToday = new Date('2026-10-25T12:00:00');
     let currentRenderYear = realToday.getFullYear();
     let currentRenderMonth = realToday.getMonth(); 
 
@@ -786,7 +903,7 @@
             const slotsForDay = SCHEDULE[dayOfWeek];
 
             const isFirstWeek = (day >= 1 && day <= 7);
-            const isMonOrTue = (dayOfWeek === 1 || dayOfWeek === 2);
+            const isAvailableDay = (dayOfWeek === 1 || dayOfWeek === 2 || dayOfWeek === 4 || dayOfWeek === 5);
 
             if (isHoliday) {
                 cell.className = 'day-cell past';
@@ -803,7 +920,7 @@
             } else if ((currentMode === 'bimonthly' || currentMode === 'bimonthly-multi') && !isBimonthlyOpen) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">未開放</div>`;
-            } else if ((currentMode === 'bimonthly' || currentMode === 'bimonthly-multi') && (!isOddMonth || !isFirstWeek || !isMonOrTue)) {
+            } else if ((currentMode === 'bimonthly' || currentMode === 'bimonthly-multi') && (!isOddMonth || !isFirstWeek || !isAvailableDay)) {
                 cell.className = 'day-cell past';
                 cell.innerHTML = `${day}<div class="status-text" style="font-size:9px;">不開放</div>`;
             } else if (currentMode === 'makeup' && activeMakeupCredit) {
@@ -887,7 +1004,7 @@
         const currentHour = realToday.getHours();
 
         slots.forEach(slot => {
-            const timeLabel = `${slot.start} - ${slot.end}`;
+            const timeLabel = `${slot.teacher}  ${slot.start}~${slot.end}`;
             
             if (currentMode === 'makeup' && activeMakeupCredit) {
                 if (selectedDayOfWeek === activeMakeupCredit.originalDayOfWeek && slot.start === activeMakeupCredit.originalStartTime) {
@@ -943,8 +1060,10 @@
 
     // ✅ 新增：切換星期功能
     function switchMultiDay(dayOfWeek) {
-        document.getElementById('btn-day-1').className = (dayOfWeek === 1) ? 'mode-btn active' : 'mode-btn';
-        document.getElementById('btn-day-2').className = (dayOfWeek === 2) ? 'mode-btn active' : 'mode-btn';
+        [1, 2, 4, 5].forEach(d => {
+            const btn = document.getElementById(`btn-day-${d}`);
+            if (btn) btn.className = (d === dayOfWeek) ? 'mode-btn active' : 'mode-btn';
+        });
         
         // 尋找當月第一週的對應星期幾作為基準日
         let firstDayDate = 1;
@@ -1210,10 +1329,13 @@
                         let canLeave = true;
                         let reason = "";
 
+                        // 判斷該訂單的請假上限：多堂為 2 次，單堂(一堂)為 1 次
+                        let maxLeave = (booking.mode === 'bimonthly-multi') ? 2 : 1;
+
                         if (hoursDiff < 12) {
                             canLeave = false;
                             reason = "逾時";
-                        } else if (currentLeaveCount >= 1) {
+                        } else if (currentLeaveCount >= maxLeave) {
                             canLeave = false;
                             reason = "已達上限";
                         }
