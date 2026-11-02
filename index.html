@@ -208,8 +208,7 @@
                 <ul>
                     <li><strong>事假（含個人因素）：</strong>
                         <ul>
-                            <li>(一堂)：一期最多可請假 1 次 (最慢為上課前12小時)。</li>
-                            <li>(多堂)：一期最多可請假 2 次 (最慢為上課前12小時)。</li>
+                            <li>不限請假次數 (最慢須為上課前 12 小時完成請假，即可發放補課券)。</li>
                         </ul>
                     </li>
                     <li><strong>病假：</strong>不包含在事假次數內。若因生病或身體不適請假，只需提供簡單證明（如看診收據、藥袋照片等），即可進入補課機制。</li>
@@ -359,13 +358,12 @@
                 <hr>
 
                 <h3>📋 課程制度與規範</h3>
-                <p><strong>1️⃣ 雙月期課請假與補課制度</strong></p>
+                <p><strong>1️⃣ 雙月預約請假與補課制度</strong></p>
                 <p>為維護班級穩定與上課品質，雙月期課的請假規範如下：</p>
                 <ul>
                     <li><strong>事假（含個人因素）：</strong>
                         <ul>
-                            <li>(一堂)：一期最多可請假 1 次 (最慢為上課前12小時)。</li>
-                            <li>(多堂)：一期最多可請假 2 次 (最慢為上課前12小時)。</li>
+                            <li>不限請假次數 (最慢須為上課前 12 小時完成請假，即可發放補課券)。</li>
                         </ul>
                     </li>
                     <li><strong>病假：</strong>不包含在事假次數內。若因生病或身體不適請假，只需提供簡單證明（如看診收據、藥袋照片等），即可進入補課機制。</li>
@@ -1341,15 +1339,10 @@
                         let canLeave = true;
                         let reason = "";
 
-                        // 判斷該訂單的請假上限：多堂為 2 次，單堂(一堂)為 1 次
-                        let maxLeave = (booking.mode === 'bimonthly-multi') ? 2 : 1;
-
+                        // 不限次數，只檢查 12 小時限制
                         if (hoursDiff < 12) {
                             canLeave = false;
                             reason = "逾時";
-                        } else if (currentLeaveCount >= maxLeave) {
-                            canLeave = false;
-                            reason = "已達上限";
                         }
 
                         let actionHtml = canLeave 
