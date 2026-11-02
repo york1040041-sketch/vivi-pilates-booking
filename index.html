@@ -638,7 +638,8 @@
     // 新增：多堂預約所需的狀態變數
     let multiSelections = {}; 
     let baseYear, baseMonth; 
-    let cloudHolidays = []; // ✨ 新增：動態存儲後台設定的休館日     
+    let cloudHolidays = []; // ✨ 新增：動態存儲後台設定的休館日
+    let cloudVipCode = "";     
 
     // 測試區塊保持原樣
     const realToday = new Date();
@@ -702,6 +703,7 @@
             
             cloudBookingData = resData.counts;
             cloudHolidays = resData.holidays || []; // ✨ 從雲端接下休館日
+            cloudVipCode = resData.vipCode || ""; // ✨ 新增這行
             const activeCloudIds = resData.activeIds || [];
 
             let myBookings = JSON.parse(localStorage.getItem('vivi_my_bookings')) || [];
@@ -876,6 +878,10 @@
 
         const todayZero = new Date(realToday.getFullYear(), realToday.getMonth(), realToday.getDate());
 
+        // ✨ 修改這裡：去對比試算表 B1 格子裡的密碼
+        const urlParams = new URLSearchParams(window.location.search);
+        // 如果雲端密碼不是空的，且網址的密碼跟雲端一樣，就解鎖！
+        const isVIP = (cloudVipCode !== "") && (urlParams.get('vip') === cloudVipCode);
         let cellMonthIdx = currentRenderMonth; 
         let groupStartMonth = (cellMonthIdx % 2 === 0) ? cellMonthIdx : cellMonthIdx - 1;
         let singleOpenDate = new Date(currentRenderYear, groupStartMonth - 1, 20);
