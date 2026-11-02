@@ -878,14 +878,16 @@
 
         const todayZero = new Date(realToday.getFullYear(), realToday.getMonth(), realToday.getDate());
 
-        // ✨ 修改這裡：去對比試算表 B1 格子裡的密碼
+// ✨ 修改這裡：去對比試算表 B1 格子裡的密碼
         const urlParams = new URLSearchParams(window.location.search);
         // 如果雲端密碼不是空的，且網址的密碼跟雲端一樣，就解鎖！
         const isVIP = (cloudVipCode !== "") && (urlParams.get('vip') === cloudVipCode);
         let cellMonthIdx = currentRenderMonth; 
         let groupStartMonth = (cellMonthIdx % 2 === 0) ? cellMonthIdx : cellMonthIdx - 1;
         let singleOpenDate = new Date(currentRenderYear, groupStartMonth - 1, 20);
-        let isSingleOpen = todayZero >= singleOpenDate;
+        
+        // ✨ 修改 1：加上 || isVIP，讓 VIP 無視單堂開放時間
+        let isSingleOpen = (todayZero >= singleOpenDate) || isVIP; 
 
         let targetPeriodStartMonthIdx = groupStartMonth;
         let bookingWindowMonthIdx = targetPeriodStartMonthIdx - 1;
@@ -896,14 +898,18 @@
         }
         let bimonthlyWindowStart = new Date(bookingWindowYear, bookingWindowMonthIdx, 15);
         let bimonthlyWindowEnd = new Date(bookingWindowYear, bookingWindowMonthIdx + 1, 0); 
-        let isBimonthlyOpen = todayZero >= bimonthlyWindowStart && todayZero <= bimonthlyWindowEnd;
+        
+        // ✨ 修改 2：加上 || isVIP，讓 VIP 無視雙月期課開放時間
+        let isBimonthlyOpen = (todayZero >= bimonthlyWindowStart && todayZero <= bimonthlyWindowEnd) || isVIP;
 
         for (let day = 1; day <= daysInMonth; day++) {
             const cell = document.createElement('div');
             const dateKey = `${currentRenderYear}-${String(currentRenderMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
             
             let cellDate = new Date(currentRenderYear, currentRenderMonth, day);
-            const isPastDate = cellDate < todayZero;
+            
+            // ✨ 修改 3：加上 && !isVIP，讓 VIP 可以點選過去的日期 (方便您事後補建檔)
+            const isPastDate = (cellDate < todayZero) && !isVIP;            
             const isHoliday = cloudHolidays.includes(dateKey); // ✨ 使用從雲端載入的休館日
             const dayOfWeek = cellDate.getDay();
             const slotsForDay = SCHEDULE[dayOfWeek];
