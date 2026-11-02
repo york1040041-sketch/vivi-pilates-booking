@@ -1369,15 +1369,26 @@
                     `;
                 }
 
-                // ✨ 暫時移除 12 小時取消限制，強制允許取消
+                // ✨ 新增：計算整筆訂單「第一堂課」的時間差，用來限制「取消」按鈕
                 let firstClassKey = booking.datesArray[0]; 
                 let firstDate = firstClassKey.split('_')[0];
                 let firstTime = firstClassKey.split('_')[1];
                 let firstClassDateObj = new Date(`${firstDate.replace(/-/g, '/')} ${firstTime}:00`);
+                let firstClassHoursDiff = (firstClassDateObj.getTime() - realToday.getTime()) / (1000 * 60 * 60);
 
-                // 強制設定為可以取消
-                let canCancel = true; 
+                let canCancel = true;
                 let cancelReason = "";
+
+                // 單堂/補課，若低於12小時就不可取消
+                if (!isBimonthly && firstClassHoursDiff < 12) {
+                    canCancel = false;
+                    cancelReason = "逾時";
+                }
+                // 雙月期課，若整期已經快開始了(或已開始)，也不可線上直接取消整期
+                if (isBimonthly && firstClassHoursDiff < 12) {
+                    canCancel = false;
+                    cancelReason = "逾時/已開課";
+                }
 
                 const safeUid = booking.uid || ""; 
                 let cancelActionHtml = canCancel 
